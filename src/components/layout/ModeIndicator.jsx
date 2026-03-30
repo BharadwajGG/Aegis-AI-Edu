@@ -7,14 +7,14 @@ export function ModeIndicator({ isGrowth, accent, isGhost }) {
     <div style={{
       marginTop: 24, padding: "12px 20px",
       borderRadius: isGrowth ? 16 : 6,
-      background: "rgba(255,255,255,0.02)",
-      border: "1px solid rgba(255,255,255,0.05)",
+      background: "var(--input-bg)",
+      border: "1px solid var(--input-border)",
       display: "flex", alignItems: "center", justifyContent: "space-between",
       transition: "border-radius 0.5s ease",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <PulseDot color={accent} />
-        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", letterSpacing: 2 }}>
+        <span style={{ fontSize: 10, color: "var(--text-subtle)", letterSpacing: 2 }}>
           {isGrowth ? "PRIVATE JOURNAL MODE" : "COMPETITIVE ARENA MODE"} · AEGIS v2.4
         </span>
       </div>
@@ -24,7 +24,7 @@ export function ModeIndicator({ isGrowth, accent, isGhost }) {
             <Ghost size={11} /> IDENTITY SHIELDED
           </div>
         )}
-        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", letterSpacing: 1 }}>
+        <div style={{ fontSize: 10, color: "var(--text-subtle)", letterSpacing: 1 }}>
           {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </div>
       </div>

@@ -4,8 +4,8 @@ import { Target, Zap, Clock, Flame } from "lucide-react";
 
 export function StatsSidebar({ accent, cardStyle }) {
   return (
-    <motion.div layout style={{ ...cardStyle, gridColumn: "span 4", padding: 24 }}>
-      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", letterSpacing: 2, marginBottom: 16 }}>
+    <motion.div layout className="bento-card md-col-span-4" style={{ ...cardStyle, padding: 24 }}>
+      <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2, marginBottom: 16 }}>
         MATCH STATS
       </div>
       {[
@@ -17,10 +17,10 @@ export function StatsSidebar({ accent, cardStyle }) {
         <div key={label} style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "12px 14px", borderRadius: 6, marginBottom: 8,
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.05)",
+          background: "var(--input-bg)",
+          border: "1px solid var(--input-border)",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--text-muted)" }}>
             <span style={{ color: accent }}>{icon}</span>
             {label}
           </div>

@@ -1,14 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Zap, Clock } from "lucide-react";
+import toast from "react-hot-toast";
 
 export function LiveChallenge({ t, accent, accentGlow, accentCardStyle, timer }) {
+  const [ans, setAns] = useState("");
+
+  const submitDef = () => {
+    if(!ans) return;
+    toast.success("Answer submitted successfully!");
+    setAns("");
+  }
+
   return (
-    <motion.div layout style={{ ...accentCardStyle, gridColumn: "span 8", padding: 24 }}>
+    <motion.div layout className="bento-card md-col-span-8" style={{ ...accentCardStyle, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Zap size={14} color={accent} />
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", letterSpacing: 2 }}>
+          <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2 }}>
             {t.liveChallenge.toUpperCase()}
           </div>
           <div style={{
@@ -20,7 +29,7 @@ export function LiveChallenge({ t, accent, accentGlow, accentCardStyle, timer })
         <div style={{
           display: "flex", alignItems: "center", gap: 8,
           padding: "6px 14px", borderRadius: 6,
-          background: "rgba(0,0,0,0.4)", border: `1px solid ${accentGlow}`,
+          background: "var(--input-bg)", border: `1px solid ${accentGlow}`,
         }}>
           <Clock size={11} color={accent} />
           <span style={{ fontSize: 16, fontWeight: 900, color: accent, fontVariantNumeric: "tabular-nums" }}>
@@ -31,13 +40,13 @@ export function LiveChallenge({ t, accent, accentGlow, accentCardStyle, timer })
 
       <div style={{
         padding: "18px 20px", borderRadius: 8,
-        background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--input-bg)", border: "1px solid var(--input-border)",
         marginBottom: 16,
       }}>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", letterSpacing: 1, marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: "var(--text-subtle)", letterSpacing: 1, marginBottom: 10 }}>
           {t.challengeLabel.toUpperCase()} · CALCULUS II
         </div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.9)", lineHeight: 1.7, fontStyle: "italic" }}>
+        <div style={{ fontSize: 14, color: "var(--text-main)", lineHeight: 1.7, fontStyle: "italic" }}>
           {t.challengeQ}
         </div>
       </div>
@@ -45,15 +54,17 @@ export function LiveChallenge({ t, accent, accentGlow, accentCardStyle, timer })
       <div style={{ display: "flex", gap: 10 }}>
         <input
           placeholder="f(x) = ..."
+          value={ans}
+          onChange={e => setAns(e.target.value)}
           style={{
             flex: 1, padding: "12px 16px", borderRadius: 6,
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            color: "rgba(255,255,255,0.8)", fontSize: 13, outline: "none",
+            background: "var(--bg-main)",
+            border: "1px solid var(--input-border)",
+            color: "var(--text-main)", fontSize: 13, outline: "none",
             fontFamily: "'IBM Plex Mono', monospace",
           }}
         />
-        <button style={{
+        <button onClick={submitDef} style={{
           padding: "12px 20px", borderRadius: 6,
           background: accent, border: "none",
           color: "#fff", fontSize: 12, cursor: "pointer",

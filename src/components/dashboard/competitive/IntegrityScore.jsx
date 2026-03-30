@@ -5,10 +5,10 @@ import { RadialProgress } from "../../ui/RadialProgress";
 
 export function IntegrityScore({ t, accent, cardStyle }) {
   return (
-    <motion.div layout style={{ ...cardStyle, gridColumn: "span 3", padding: 24 }}>
+    <motion.div layout className="bento-card md-col-span-3" style={{ ...cardStyle, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
         <Shield size={14} color={accent} />
-        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", letterSpacing: 2 }}>
+        <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2 }}>
           {t.integrityScore.toUpperCase()}
         </div>
       </div>
@@ -16,7 +16,7 @@ export function IntegrityScore({ t, accent, cardStyle }) {
         <RadialProgress value={94} color={accent} size={96} stroke={7} />
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
           <div style={{ fontSize: 22, fontWeight: 900, color: accent }}>94</div>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)" }}>{t.publicScore}</div>
+          <div style={{ fontSize: 9, color: "var(--text-subtle)" }}>{t.publicScore}</div>
         </div>
       </div>
       <div style={{

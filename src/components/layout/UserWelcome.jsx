@@ -6,13 +6,14 @@ export function UserWelcome({ t, displayName, isGhost }) {
   return (
     <motion.div layout style={{ marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
       <div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", letterSpacing: 2, marginBottom: 4 }}>
+        <div style={{ fontSize: 11, color: "var(--text-subtle)", letterSpacing: 2, marginBottom: 4 }}>
           {t.welcomeBack},
         </div>
         <motion.div layout style={{
           fontSize: 22, fontWeight: 700, letterSpacing: 1,
           filter: isGhost ? "blur(8px)" : "none",
           transition: "filter 0.5s ease",
+          color: "var(--text-main)",
         }}>
           {displayName}
         </motion.div>

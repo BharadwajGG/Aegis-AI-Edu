@@ -6,10 +6,10 @@ import { BarProgress } from "../../ui/BarProgress";
 
 export function GlobalRank({ t, accent, accentCardStyle, isGhost }) {
   return (
-    <motion.div layout style={{ ...accentCardStyle, gridColumn: "span 4", padding: 24 }}>
+    <motion.div layout className="bento-card md-col-span-4" style={{ ...accentCardStyle, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
         <Trophy size={13} color={accent} />
-        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", letterSpacing: 2 }}>
+        <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2 }}>
           {t.globalRank.toUpperCase()}
         </div>
         <div style={{ marginLeft: "auto" }}>
@@ -30,11 +30,11 @@ export function GlobalRank({ t, accent, accentCardStyle, isGhost }) {
               <ArrowUp size={16} color="#10b981" />
             </div>
           </div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 16 }}>
+          <div style={{ fontSize: 11, color: "var(--text-subtle)", marginBottom: 16 }}>
             {t.outOf} 14,832 {t.students}
           </div>
           <BarProgress value={83} color={accent} />
-          <div style={{ marginTop: 8, fontSize: 10, color: "rgba(255,255,255,0.3)" }}>
+          <div style={{ marginTop: 8, fontSize: 10, color: "var(--text-subtle)" }}>
             +18 ↑ this week
           </div>
         </>
@@ -42,10 +42,10 @@ export function GlobalRank({ t, accent, accentCardStyle, isGhost }) {
 
       <div style={{
         marginTop: 16, padding: "10px 14px", borderRadius: 6,
-        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--input-bg)", border: "1px solid var(--input-border)",
         display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
-        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{t.rankUp}</span>
+        <span style={{ fontSize: 10, color: "var(--text-subtle)" }}>{t.rankUp}</span>
         <span style={{ fontSize: 11, color: accent, fontWeight: 700 }}>Top 200 →</span>
       </div>
     </motion.div>

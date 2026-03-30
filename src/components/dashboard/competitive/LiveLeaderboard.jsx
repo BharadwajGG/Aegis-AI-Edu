@@ -5,15 +5,15 @@ import { PulseDot } from "../../ui/PulseDot";
 
 export function LiveLeaderboard({ accent, accentDim, accentGlow, cardStyle, isGhost, ghostName }) {
   return (
-    <motion.div layout style={{ ...cardStyle, gridColumn: "span 5", padding: 24 }}>
+    <motion.div layout className="bento-card md-col-span-5" style={{ ...cardStyle, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
         <BarChart3 size={14} color={accent} />
-        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", letterSpacing: 2 }}>
+        <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2 }}>
           LEADERBOARD
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
           <PulseDot color={accent} />
-          <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)" }}>LIVE</span>
+          <span style={{ fontSize: 9, color: "var(--text-subtle)" }}>LIVE</span>
         </div>
       </div>
       {[
@@ -27,24 +27,24 @@ export function LiveLeaderboard({ accent, accentDim, accentGlow, cardStyle, isGh
           display: "flex", alignItems: "center", gap: 12,
           padding: "10px 12px", borderRadius: 6,
           marginBottom: 6,
-          background: isMe ? accentDim : "rgba(255,255,255,0.02)",
+          background: isMe ? accentDim : "var(--input-bg)",
           border: isMe ? `1px solid ${accentGlow}` : "1px solid transparent",
           transition: "all 0.3s",
         }}>
           <div style={{
             width: 22, height: 22, borderRadius: 4,
-            background: rank <= 3 ? accent : "rgba(255,255,255,0.06)",
+            background: rank <= 3 ? accent : "var(--input-bg)",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 10, fontWeight: 700,
-            color: rank <= 3 ? "#fff" : "rgba(255,255,255,0.4)",
+            color: rank <= 3 ? "#fff" : "var(--text-muted)",
           }}>
             {rank}
           </div>
-          <div style={{ flex: 1, fontSize: 12, color: isMe ? "#fff" : "rgba(255,255,255,0.6)" }}>
+          <div style={{ flex: 1, fontSize: 12, color: isMe ? "var(--text-main)" : "var(--text-muted)" }}>
             {isMe && isGhost ? <span style={{ filter: "blur(4px)" }}>{name}</span> : name}
             {isMe && <span style={{ fontSize: 9, color: accent, marginLeft: 6 }}>YOU</span>}
           </div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginRight: 4 }}>{score.toLocaleString()}</div>
+          <div style={{ fontSize: 11, color: "var(--text-subtle)", marginRight: 4 }}>{score.toLocaleString()}</div>
           <div style={{ fontSize: 10, color: "#10b981" }}>{delta}</div>
         </div>
       ))}

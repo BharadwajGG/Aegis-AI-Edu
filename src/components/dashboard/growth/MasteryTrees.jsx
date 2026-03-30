@@ -5,8 +5,8 @@ import { BarProgress } from "../../ui/BarProgress";
 
 export function MasteryTrees({ t, accent, cardStyle }) {
   return (
-    <motion.div layout style={{ ...cardStyle, gridColumn: "span 5", padding: 24 }}>
-      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", letterSpacing: 2, marginBottom: 18 }}>
+    <motion.div layout className="bento-card md-col-span-5" style={{ ...cardStyle, padding: 24 }}>
+      <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2, marginBottom: 18 }}>
         {t.masteryProgress.toUpperCase()}
       </div>
       {[
@@ -16,7 +16,7 @@ export function MasteryTrees({ t, accent, cardStyle }) {
       ].map(({ label, value, icon }) => (
         <div key={label} style={{ marginBottom: 18 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}>
               <span style={{ color: accent }}>{icon}</span>
               {label}
             </div>
@@ -27,10 +27,10 @@ export function MasteryTrees({ t, accent, cardStyle }) {
       ))}
       <div style={{
         marginTop: 8, padding: "10px 14px", borderRadius: 10,
-        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--input-bg)", border: "1px solid var(--input-border)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
-        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{t.nextMilestone}</div>
+        <div style={{ fontSize: 10, color: "var(--text-subtle)" }}>{t.nextMilestone}</div>
         <div style={{ fontSize: 11, color: accent, fontWeight: 600 }}>Calculus II →</div>
       </div>
     </motion.div>
