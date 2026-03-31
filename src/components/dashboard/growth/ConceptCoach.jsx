@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Brain, Sparkles, Send, RefreshCw } from "lucide-react";
 import { PulseDot } from "../../ui/PulseDot";
-import { fetchConceptCoach } from "../../../utils/anthropicApi";
+import { fetchConceptCoach } from "../../../utils/geminiApi";
 import toast from "react-hot-toast";
 
 export function ConceptCoach({ t, accent, accentGlow, cardStyle, apiKey, isCompetitive }) {
@@ -19,7 +19,7 @@ export function ConceptCoach({ t, accent, accentGlow, cardStyle, apiKey, isCompe
     setResponse(""); // Clear for loading state
     try {
       const systemPrompt = mode === "socratic" 
-        ? "You are a concept coach. Guide the user to the answer using Socratic questioning. Do not give direct answers." 
+        ? "You are a concept coach. Do not directly give the final answer. Instead, provide hints based on the student's current understanding, ask thought-provoking questions, and give small quizzes to help them discover the answer themselves. Your goal is to make the core concepts clear through guided discovery." 
         : "You are a competitive tutor. Give the concise, mathematically direct answer instantly.";
       
       const res = await fetchConceptCoach(input, apiKey, systemPrompt);

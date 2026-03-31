@@ -37,8 +37,8 @@ export default function AegisDashboard() {
   // Settings & Profile
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [userName, setUserName] = useState("Aryan Desai");
-  const [apiKey, setApiKey] = useState(() => window.localStorage.getItem("anthropic_key") || "");
-  useEffect(() => window.localStorage.setItem("anthropic_key", apiKey), [apiKey]);
+  const [apiKey, setApiKey] = useState(() => window.localStorage.getItem("gemini_key") || "AIzaSyAi39J90J6TLajkiXzEFBEq673DzZKiM1w");
+  useEffect(() => window.localStorage.setItem("gemini_key", apiKey), [apiKey]);
 
   const [ghostName] = useState(GHOST_NAMES[Math.floor(Math.random() * GHOST_NAMES.length)]);
   const [coachInput, setCoachInput] = useState("");
