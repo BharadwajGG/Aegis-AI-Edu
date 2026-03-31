@@ -17,7 +17,7 @@ import { DailyStreak } from "./src/components/dashboard/growth/DailyStreak";
 import { MasteryTrees } from "./src/components/dashboard/growth/MasteryTrees";
 import { ActivityChart } from "./src/components/dashboard/growth/ActivityChart";
 import { ConceptCoach } from "./src/components/dashboard/growth/ConceptCoach";
-import { PersonalRoadmap } from "./src/components/dashboard/growth/PersonalRoadmap";
+import { AIRoadmapCard } from "./src/components/dashboard/growth/AIRoadmapCard";
 
 import { GlobalRank } from "./src/components/dashboard/competitive/GlobalRank";
 import { LiveLeaderboard } from "./src/components/dashboard/competitive/LiveLeaderboard";
@@ -134,7 +134,7 @@ export default function AegisDashboard() {
                   coachInput={coachInput} setCoachInput={setCoachInput} apiKey={apiKey}
                 />
                 
-                <PersonalRoadmap t={t} accent={accent} cardStyle={cardStyle} />
+                <AIRoadmapCard t={t} accent={accent} accentGlow={accentGlow} cardStyle={cardStyle} />
 
               </motion.div>
             ) : (

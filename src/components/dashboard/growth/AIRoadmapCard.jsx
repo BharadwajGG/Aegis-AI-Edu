@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Map, Loader2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 
-export function AIRoadmapCard({ t, accent, cardStyle }) {
+export function AIRoadmapCard({ t, accent, accentGlow, cardStyle }) {
   const [goal, setGoal] = useState("");
   const [level, setLevel] = useState("Beginner");
   const [mode, setMode] = useState("Balanced");
@@ -168,7 +168,9 @@ export function AIRoadmapCard({ t, accent, cardStyle }) {
                   <div 
                     onClick={() => togglePhase(i)}
                     style={{
-                      padding: "16px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between"
+                      padding: "16px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between",
+                      background: expandedPhases[i] ? `linear-gradient(90deg, ${accentGlow}, transparent)` : "transparent",
+                      borderBottom: expandedPhases[i] ? `1px solid var(--card-border)` : "none"
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

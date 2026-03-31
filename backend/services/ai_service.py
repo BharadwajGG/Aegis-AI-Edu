@@ -6,7 +6,7 @@ from config import settings
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
 # Use the recommended model for fast and structured text generation
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 def build_domain_context(goal: str, level: str) -> str:
     """
