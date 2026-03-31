@@ -8,7 +8,7 @@ import { GHOST_NAMES } from "./src/constants/ghostNames";
 import { useTimer } from "./src/hooks/useTimer";
 
 import { SplashScreen } from "./src/components/layout/SplashScreen";
-import { TopNavigation } from "./src/components/layout/TopNavigation";
+import { Sidebar } from "./src/components/layout/Sidebar";
 import { UserWelcome } from "./src/components/layout/UserWelcome";
 import { ModeIndicator } from "./src/components/layout/ModeIndicator";
 import { SettingsModal } from "./src/components/layout/SettingsModal";
@@ -33,6 +33,10 @@ export default function AegisDashboard() {
   const [isGhost, setIsGhost] = useState(false);
   const [lang, setLang] = useState("en");
   const [langOpen, setLangOpen] = useState(false);
+  
+  // Sidebar & View States
+  const [activeView, setActiveView] = useState("overview");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Settings & Profile
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -86,6 +90,7 @@ export default function AegisDashboard() {
         minHeight: "100vh",
         overflowX: "hidden",
         position: "relative",
+        display: "flex" // Changed from block to flex to support sidebar layout
       }}>
         {/* Ambient background glow */}
         <div style={{
@@ -101,68 +106,80 @@ export default function AegisDashboard() {
           position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1,
           backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, var(--scanline) 2px, var(--scanline) 4px)",
         }} />
+        
+        {/* Static Sidebar spacer so the fixed absolute Sidebar doesn't overlap text */}
+        <motion.div 
+          animate={{ width: sidebarCollapsed ? 80 : 260 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          style={{ flexShrink: 0 }}
+        />
 
-        <div style={{ position: "relative", zIndex: 2, maxWidth: 1280, margin: "0 auto", padding: "0 20px 40px" }}>
-          <TopNavigation 
-            t={t} accent={accent} accentDim={accentDim} accentGlow={accentGlow}
-            lang={lang} setLang={setLang} langOpen={langOpen} setLangOpen={setLangOpen}
-            mode={mode} setMode={setMode}
-            isGhost={isGhost} setIsGhost={setIsGhost}
-            displayAvatar={displayAvatar}
-            theme={theme} toggleTheme={toggleTheme}
-            openSettings={() => setSettingsOpen(true)}
-          />
+        <Sidebar 
+          t={t} accent={accent} accentDim={accentDim} accentGlow={accentGlow}
+          lang={lang} setLang={setLang} langOpen={langOpen} setLangOpen={setLangOpen}
+          mode={mode} setMode={setMode}
+          isGhost={isGhost} setIsGhost={setIsGhost}
+          displayAvatar={displayAvatar}
+          openSettings={() => setSettingsOpen(true)}
+          activeView={activeView} setActiveView={setActiveView}
+          collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed}
+        />
 
-          <UserWelcome 
-            t={t} displayName={displayName} isGhost={isGhost}
-          />
+        {/* Main Content Area */}
+        <div style={{ flex: 1, position: "relative", zIndex: 2, padding: "40px 60px" }}>
+          
+          <UserWelcome t={t} displayName={displayName} isGhost={isGhost} />
 
-          {/* ── BENTO GRID ── */}
+          {/* ── CONDITIONAL VIEWS ── */}
           <AnimatePresence mode="wait">
-            {isGrowth ? (
-              <motion.div key="growth"
+            
+            {activeView === "overview" && (
+              <motion.div key="overview"
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.4 }}
-                className="bento-grid">
-                
-                <DailyStreak t={t} accent={accent} accentCardStyle={accentCardStyle} />
-                <MasteryTrees t={t} accent={accent} cardStyle={cardStyle} />
-                <ActivityChart t={t} accent={accent} cardStyle={cardStyle} />
-                
-                <ConceptCoach 
-                  t={t} accent={accent} accentGlow={accentGlow} cardStyle={cardStyle}
-                  coachInput={coachInput} setCoachInput={setCoachInput} apiKey={apiKey}
-                />
-                
-                <AIRoadmapCard t={t} accent={accent} accentGlow={accentGlow} cardStyle={cardStyle} />
-
-              </motion.div>
-            ) : (
-              <motion.div key="competitive"
-                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4 }}
-                className="bento-grid">
-                
-                <GlobalRank t={t} accent={accent} accentCardStyle={accentCardStyle} isGhost={isGhost} />
-                <LiveLeaderboard accent={accent} accentDim={accentDim} accentGlow={accentGlow} cardStyle={cardStyle} isGhost={isGhost} ghostName={ghostName} />
-                <IntegrityScore t={t} accent={accent} cardStyle={cardStyle} />
-                
-                <LiveChallenge t={t} accent={accent} accentGlow={accentGlow} accentCardStyle={accentCardStyle} timer={timer} />
-                
-                <StatsSidebar accent={accent} cardStyle={cardStyle} />
-                
-                {/* Concept coach is also available in competitive mode! */}
-                <ConceptCoach 
-                  t={t} accent={accent} accentGlow={accentGlow} cardStyle={cardStyle}
-                  coachInput={coachInput} setCoachInput={setCoachInput} apiKey={apiKey}
-                  isCompetitive={true}
-                />
-
+              >
+                {isGrowth ? (
+                  <div className="bento-grid">
+                    <DailyStreak t={t} accent={accent} accentCardStyle={accentCardStyle} />
+                    <MasteryTrees t={t} accent={accent} cardStyle={cardStyle} />
+                    <ActivityChart t={t} accent={accent} cardStyle={cardStyle} />
+                  </div>
+                ) : (
+                  <div className="bento-grid">
+                    <GlobalRank t={t} accent={accent} accentCardStyle={accentCardStyle} isGhost={isGhost} />
+                    <LiveLeaderboard accent={accent} accentDim={accentDim} accentGlow={accentGlow} cardStyle={cardStyle} isGhost={isGhost} ghostName={ghostName} />
+                    <IntegrityScore t={t} accent={accent} cardStyle={cardStyle} />
+                    <LiveChallenge t={t} accent={accent} accentGlow={accentGlow} accentCardStyle={accentCardStyle} timer={timer} />
+                    <StatsSidebar accent={accent} cardStyle={cardStyle} />
+                  </div>
+                )}
               </motion.div>
             )}
+
+            {activeView === "roadmap" && (
+              <motion.div key="roadmap"
+                initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                style={{ width: "100%", maxWidth: 1000, margin: "0 auto" }}
+              >
+                <AIRoadmapCard t={t} accent={accent} accentGlow={accentGlow} cardStyle={{...cardStyle, gridColumn: "span 12", minHeight: 400}} />
+              </motion.div>
+            )}
+
+            {activeView === "coach" && (
+              <motion.div key="coach"
+                initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                style={{ width: "100%", maxWidth: 1000, margin: "0 auto" }}
+              >
+                <ConceptCoach 
+                  t={t} accent={accent} accentGlow={accentGlow} cardStyle={{...cardStyle, gridColumn: "span 12", minHeight: 400}}
+                  coachInput={coachInput} setCoachInput={setCoachInput} apiKey={apiKey}
+                />
+              </motion.div>
+            )}
+
           </AnimatePresence>
 
-          <ModeIndicator isGrowth={isGrowth} accent={accent} isGhost={isGhost} />
+          {activeView === "overview" && <ModeIndicator isGrowth={isGrowth} accent={accent} isGhost={isGhost} />}
         </div>
       </div>
       
