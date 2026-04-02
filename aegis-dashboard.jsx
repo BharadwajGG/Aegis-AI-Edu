@@ -18,6 +18,7 @@ import { MasteryTrees } from "./src/components/dashboard/growth/MasteryTrees";
 import { ActivityChart } from "./src/components/dashboard/growth/ActivityChart";
 import { ConceptCoach } from "./src/components/dashboard/growth/ConceptCoach";
 import { AIRoadmapCard } from "./src/components/dashboard/growth/AIRoadmapCard";
+import { CommunityHub } from "./src/components/dashboard/growth/CommunityHub";
 
 import { GlobalRank } from "./src/components/dashboard/competitive/GlobalRank";
 import { LiveLeaderboard } from "./src/components/dashboard/competitive/LiveLeaderboard";
@@ -41,6 +42,7 @@ export default function AegisDashboard() {
   // Settings & Profile
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [userName, setUserName] = useState("Aryan Desai");
+  const [userCollege, setUserCollege] = useState("Maharashtra Institute of Technology (MIT)");
   const [apiKey, setApiKey] = useState(() => window.localStorage.getItem("gemini_key") || "AIzaSyAi39J90J6TLajkiXzEFBEq673DzZKiM1w");
   useEffect(() => window.localStorage.setItem("gemini_key", apiKey), [apiKey]);
 
@@ -173,6 +175,18 @@ export default function AegisDashboard() {
                 <ConceptCoach 
                   t={t} accent={accent} accentGlow={accentGlow} cardStyle={{...cardStyle, gridColumn: "span 12", minHeight: 400}}
                   coachInput={coachInput} setCoachInput={setCoachInput} apiKey={apiKey}
+                />
+              </motion.div>
+            )}
+
+            {activeView === "community" && (
+              <motion.div key="community"
+                initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                style={{ width: "100%", maxWidth: 1000, margin: "0 auto" }}
+              >
+                <CommunityHub 
+                  t={t} accent={accent} accentGlow={accentGlow} accentDim={accentDim} cardStyle={{...cardStyle, gridColumn: "span 12", minHeight: 400}}
+                  userCollege={userCollege}
                 />
               </motion.div>
             )}
