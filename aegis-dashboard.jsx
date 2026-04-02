@@ -161,7 +161,7 @@ export default function AegisDashboard() {
                 initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                 style={{ width: "100%", maxWidth: 1000, margin: "0 auto" }}
               >
-                <AIRoadmapCard t={t} accent={accent} accentGlow={accentGlow} cardStyle={{...cardStyle, gridColumn: "span 12", minHeight: 400}} />
+                <AIRoadmapCard t={t} accent={accent} accentGlow={accentGlow} cardStyle={{...cardStyle, gridColumn: "span 12", minHeight: 400}} apiKey={apiKey} />
               </motion.div>
             )}
 

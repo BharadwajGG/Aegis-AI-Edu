@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Map, Loader2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 
-export function AIRoadmapCard({ t, accent, accentGlow, cardStyle }) {
+export function AIRoadmapCard({ t, accent, accentGlow, cardStyle, apiKey }) {
   const [goal, setGoal] = useState("");
   const [level, setLevel] = useState("Beginner");
   const [mode, setMode] = useState("Balanced");
@@ -27,7 +27,7 @@ export function AIRoadmapCard({ t, accent, accentGlow, cardStyle }) {
       const res = await fetch("http://localhost:8000/api/roadmap/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal, level, mode }),
+        body: JSON.stringify({ goal, level, mode, api_key: apiKey }),
       });
       
       if (!res.ok) throw new Error("Failed to generate roadmap");

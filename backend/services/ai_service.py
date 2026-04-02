@@ -2,11 +2,9 @@ import json
 import google.generativeai as genai
 from config import settings
 
-# Initialize Gemini
-genai.configure(api_key=settings.GEMINI_API_KEY)
+# Initialize Gemini is deferred to generate_roadmap_json to allow dynamic keys
 
-# Use the recommended model for fast and structured text generation
-model = genai.GenerativeModel('gemini-2.5-flash')
+# Model instantiation deferred to request time
 
 def build_domain_context(goal: str, level: str) -> str:
     """
@@ -30,7 +28,15 @@ def build_domain_context(goal: str, level: str) -> str:
     
     return base_instructions
 
-def generate_roadmap_json(goal: str, level: str, mode: str) -> dict:
+def generate_roadmap_json(goal: str, level: str, mode: str, api_key: str = None) -> dict:
+    if api_key:
+        genai.configure(api_key=api_key)
+    else:
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+
+    # Use the recommended model for fast and structured text generation
+    model = genai.GenerativeModel('gemini-2.5-flash')
+
     domain_context = build_domain_context(goal, level)
     
     prompt = f"""
