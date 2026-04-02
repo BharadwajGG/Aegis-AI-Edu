@@ -75,9 +75,9 @@ To experience Aegis on your local machine, you will need to start both the Front
 
 ### 2. Start the Frontend (React + Vite)
 
-1. Open a **new** terminal window and ensure you are in the project's root directory:
+1. Open a **new** terminal window and navigate to the frontend directory:
    ```bash
-   # You should be in the root folder, e.g., 'c:\Edge Edu'
+   cd frontend
    ```
 
 2. Install all required Node.js dependencies:
