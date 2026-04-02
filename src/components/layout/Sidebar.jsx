@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Shield, Globe, ChevronDown, ChevronLeft, ChevronRight, 
-  Ghost, Settings, LayoutDashboard, Map, BrainCircuit
+  Ghost, Settings, LayoutDashboard, Map, BrainCircuit, Users
 } from "lucide-react";
 
 export function Sidebar({
@@ -19,7 +19,8 @@ export function Sidebar({
   const navItems = [
     { id: "overview", label: t.appName || "Overview", icon: <LayoutDashboard size={18} /> },
     { id: "roadmap", label: "AI Roadmap", icon: <Map size={18} /> },
-    { id: "coach", label: "Concept Coach", icon: <BrainCircuit size={18} /> }
+    { id: "coach", label: "Concept Coach", icon: <BrainCircuit size={18} /> },
+    { id: "community", label: "Community Hub", icon: <Users size={18} /> }
   ];
 
   return (
