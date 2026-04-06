@@ -24,7 +24,8 @@ export function AIRoadmapCard({ t, accent, accentGlow, cardStyle, apiKey }) {
     setLoading(true);
     try {
       // Points to our new FastAPI Backend
-      const res = await fetch("http://localhost:8000/api/roadmap/generate", {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const res = await fetch(`${API_URL}/api/roadmap/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ goal, level, mode, api_key: apiKey }),
