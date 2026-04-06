@@ -107,5 +107,22 @@ To experience Aegis on your local machine, you will need to start both the Front
 
 ---
 
+## 🌍 Live Deployment
+
+The Aegis Growth OS is currently deployed and accessible live. We utilize a modern deployment stack:
+
+- **Frontend Hosting**: Deployed on [Vercel](https://vercel.com/) (pointing to `/frontend`).
+- **Backend Hosting**: Deployed on [Render](https://render.com/) (pointing to `/backend`).
+
+### Continuous Deployment (CI/CD)
+
+Yes! Because the codebase is connected to Vercel and Render via your GitHub repository, **any changes you push to the `main` branch will automatically trigger a rebuild and reflect on the live deployed project within a few minutes**. You do not need to manually deploy every time you add a new feature.
+
+1. Make your code changes locally.
+2. Run `git add .`, `git commit -m "update"`, and `git push`.
+3. Vercel and Render will automatically detect the new code and update your live site!
+
+---
+
 ## 🤝 Contributing
 Contributions are welcome! Feel free to fork this repository, create a branch, and submit a pull request with your improvements.
