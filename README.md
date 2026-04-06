@@ -10,6 +10,10 @@ Aegis Growth OS is a comprehensive, AI-powered platform designed to provide a ho
 - **AI Roadmap Generator**: Powered by Gemini AI, it generates structured, personalized learning paths and roadmaps for students.
 - **Concept Coach AI**: An interactive, hint-based AI mentor (powered by Gemini 2.5 Flash) designed to guide students through complex topics without just giving away the answers.
 - **Mastery Validation System**: A psychology-aware assessment approach to ensure true understanding and retention of concepts.
+- **Firebase Authentication**: Secure user login and a personalized dashboard experience with Google Auth integration.
+- **Competitions & Events Feed**: Real-time listing of hackathons, seminars, and networking opportunities.
+- **Community Groups**: College-specific hubs for tracking collaborative growth, accessing materials, and connecting with peers.
+- **Dynamic Priority Ticker & Calendar**: Integrated scheduling engine to keep track of critical exams, opportunities, and deadlines.
 
 ---
 
@@ -75,17 +79,27 @@ To experience Aegis on your local machine, you will need to start both the Front
 
 ### 2. Start the Frontend (React + Vite)
 
-1. Open a **new** terminal window and ensure you are in the project's root directory:
+1. Open a **new** terminal window and navigate to the frontend directory:
    ```bash
-   # You should be in the root folder, e.g., 'c:\Edge Edu'
+   cd frontend
    ```
 
-2. Install all required Node.js dependencies:
+2. **Environment Configuration**: Create a `.env` file in the `frontend/` directory containing your Firebase configuration credentials:
+   ```env
+   VITE_FIREBASE_API_KEY="your_api_key"
+   VITE_FIREBASE_AUTH_DOMAIN="your_auth_domain"
+   VITE_FIREBASE_PROJECT_ID="your_project_id"
+   VITE_FIREBASE_STORAGE_BUCKET="your_storage_bucket"
+   VITE_FIREBASE_MESSAGING_SENDER_ID="your_messaging_sender_id"
+   VITE_FIREBASE_APP_ID="your_app_id"
+   ```
+
+3. Install all required Node.js dependencies:
    ```bash
    npm install
    ```
 
-3. Boot up the Vite development server:
+4. Boot up the Vite development server:
    ```bash
    npm run dev
    ```

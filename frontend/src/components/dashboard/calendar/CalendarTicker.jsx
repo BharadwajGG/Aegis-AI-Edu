@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarDays, Bell, AlertCircle } from 'lucide-react';
 
-export function CalendarTicker({ t, accent, accentCardStyle, events, mode }) {
+export function CalendarTicker({ t, accent, accentCardStyle, events, mode, className = "bento-card md-col-span-12" }) {
   // Sort by closest upcoming date
   const upcoming = [...events]
     .filter(e => new Date(e.date).getTime() > Date.now())
@@ -17,7 +17,7 @@ export function CalendarTicker({ t, accent, accentCardStyle, events, mode }) {
   };
 
   return (
-    <div style={{ ...accentCardStyle, padding: "24px", display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div className={className} style={{ ...accentCardStyle, padding: "24px", display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
         <div style={{ padding: 8, borderRadius: 10, background: `${accent}22` }}>
            <CalendarDays color={accent} size={18} />
