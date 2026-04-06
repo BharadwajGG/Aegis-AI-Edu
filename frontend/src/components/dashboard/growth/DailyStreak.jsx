@@ -6,7 +6,7 @@ import { PulseDot } from "../../ui/PulseDot";
 
 export function DailyStreak({ t, accent, accentCardStyle }) {
   return (
-    <motion.div layout className="bento-card md-col-span-4" style={{ ...accentCardStyle, padding: 24 }}>
+    <motion.div className="bento-card md-col-span-4" style={{ ...accentCardStyle, padding: 24 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
           <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2, marginBottom: 6 }}>

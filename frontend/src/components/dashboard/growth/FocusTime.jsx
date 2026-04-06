@@ -4,7 +4,7 @@ import { RadialProgress } from "../../ui/RadialProgress";
 
 export function FocusTime({ t, accent, cardStyle }) {
   return (
-    <motion.div layout style={{ ...cardStyle, gridColumn: "span 3", padding: 24 }}>
+    <motion.div style={{ ...cardStyle, gridColumn: "span 3", padding: 24 }}>
       <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", letterSpacing: 2, marginBottom: 16 }}>
         {t.focusTime.toUpperCase()}
       </div>

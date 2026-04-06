@@ -47,7 +47,7 @@ export function AIRoadmapCard({ t, accent, accentGlow, cardStyle, apiKey }) {
   };
 
   return (
-    <motion.div layout className="bento-card md-col-span-7" style={{ ...cardStyle, padding: 24 }}>
+    <motion.div className="bento-card md-col-span-7" style={{ ...cardStyle, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
         <Map size={16} color={accent} />
         <div style={{ fontSize: 11, color: "var(--text-subtle)", letterSpacing: 2, fontWeight: 600 }}>

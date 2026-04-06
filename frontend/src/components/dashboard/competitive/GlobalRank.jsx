@@ -6,7 +6,7 @@ import { BarProgress } from "../../ui/BarProgress";
 
 export function GlobalRank({ t, accent, accentCardStyle, isGhost }) {
   return (
-    <motion.div layout className="bento-card md-col-span-4" style={{ ...accentCardStyle, padding: 24 }}>
+    <motion.div className="bento-card md-col-span-4" style={{ ...accentCardStyle, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
         <Trophy size={13} color={accent} />
         <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2 }}>

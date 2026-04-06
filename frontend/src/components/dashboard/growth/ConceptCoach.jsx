@@ -34,7 +34,7 @@ export function ConceptCoach({ t, accent, accentGlow, cardStyle, apiKey, isCompe
   };
 
   return (
-    <motion.div layout className={`bento-card ${isCompetitive ? 'md-col-span-12' : 'md-col-span-5'}`} style={{ ...cardStyle, padding: 24 }}>
+    <motion.div className={`bento-card ${isCompetitive ? 'md-col-span-12' : 'md-col-span-5'}`} style={{ ...cardStyle, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Brain size={14} color={accent} />

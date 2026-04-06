@@ -15,7 +15,7 @@ export function LiveChallenge({ t, accent, accentGlow, accentCardStyle }) {
   }
 
   return (
-    <motion.div layout className="bento-card md-col-span-8" style={{ ...accentCardStyle, padding: 24 }}>
+    <motion.div className="bento-card md-col-span-8" style={{ ...accentCardStyle, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Zap size={14} color={accent} />

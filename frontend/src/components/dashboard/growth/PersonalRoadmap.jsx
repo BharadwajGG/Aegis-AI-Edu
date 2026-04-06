@@ -4,7 +4,7 @@ import { Map } from "lucide-react";
 
 export function PersonalRoadmap({ t, accent, cardStyle }) {
   return (
-    <motion.div layout className="bento-card md-col-span-7" style={{ ...cardStyle, padding: 24 }}>
+    <motion.div className="bento-card md-col-span-7" style={{ ...cardStyle, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
         <Map size={14} color={accent} />
         <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2 }}>

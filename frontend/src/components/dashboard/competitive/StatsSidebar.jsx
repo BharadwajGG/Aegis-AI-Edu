@@ -4,7 +4,7 @@ import { Target, Zap, Clock, Flame } from "lucide-react";
 
 export function StatsSidebar({ accent, cardStyle }) {
   return (
-    <motion.div layout className="bento-card md-col-span-4" style={{ ...cardStyle, padding: 24 }}>
+    <motion.div className="bento-card md-col-span-4" style={{ ...cardStyle, padding: 24 }}>
       <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2, marginBottom: 16 }}>
         MATCH STATS
       </div>

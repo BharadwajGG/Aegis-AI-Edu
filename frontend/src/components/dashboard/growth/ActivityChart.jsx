@@ -14,7 +14,7 @@ const data = [
 
 export function ActivityChart({ t, accent, cardStyle }) {
   return (
-    <motion.div layout className="bento-card md-col-span-3" style={{ ...cardStyle, padding: 24, display: "flex", flexDirection: "column" }}>
+    <motion.div className="bento-card md-col-span-3" style={{ ...cardStyle, padding: 24, display: "flex", flexDirection: "column" }}>
       <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2, marginBottom: 16 }}>
         {t.focusTime.toUpperCase()} / VELOCITY
       </div>
