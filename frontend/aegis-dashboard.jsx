@@ -12,6 +12,8 @@ import { Sidebar } from "./src/components/layout/Sidebar";
 import { UserWelcome } from "./src/components/layout/UserWelcome";
 import { ModeIndicator } from "./src/components/layout/ModeIndicator";
 import { SettingsModal } from "./src/components/layout/SettingsModal";
+import { AuthLanding } from "./src/components/layout/AuthLanding";
+import { useAuth } from "./src/hooks/useAuth";
 
 import { DailyStreak } from "./src/components/dashboard/growth/DailyStreak";
 import { MasteryTrees } from "./src/components/dashboard/growth/MasteryTrees";
@@ -19,6 +21,9 @@ import { ActivityChart } from "./src/components/dashboard/growth/ActivityChart";
 import { ConceptCoach } from "./src/components/dashboard/growth/ConceptCoach";
 import { AIRoadmapCard } from "./src/components/dashboard/growth/AIRoadmapCard";
 import { CommunityHub } from "./src/components/dashboard/growth/CommunityHub";
+import { GrowthCalendar } from "./src/components/dashboard/calendar/GrowthCalendar";
+import { CalendarTicker } from "./src/components/dashboard/calendar/CalendarTicker";
+import { useCalendarEngine } from "./src/hooks/useCalendarEngine";
 
 import { GlobalRank } from "./src/components/dashboard/competitive/GlobalRank";
 import { LiveLeaderboard } from "./src/components/dashboard/competitive/LiveLeaderboard";
@@ -52,6 +57,13 @@ export default function AegisDashboard() {
   const timer = useTimer(847);
   const t = LANG[lang];
 
+  const { user, login, logout, loading } = useAuth();
+  
+  // Use either the Google user profile display model or the legacy ghost model
+  const activeUserEmail = user ? user.email : "student@example.edu";
+  const activeDisplayName = user ? user.displayName : userName;
+  const { events, addEvent, syncUniversityEvents } = useCalendarEngine(mode, activeUserEmail);
+
   const isGrowth = mode === "growth";
   const accent = isGrowth ? "#10b981" : "#f43f5e";
   const accentDim = isGrowth ? "rgba(16,185,129,0.15)" : "rgba(244,63,94,0.15)";
@@ -63,8 +75,8 @@ export default function AegisDashboard() {
     return () => clearInterval(id);
   }, []);
 
-  const displayName = isGhost ? ghostName : userName;
-  const displayAvatar = isGhost ? null : displayName.substring(0, 2).toUpperCase();
+  const displayName = isGhost ? ghostName : activeDisplayName;
+  const displayAvatar = isGhost ? null : (user?.photoURL || displayName.substring(0, 2).toUpperCase());
 
   const cardStyle = {
     background: "var(--card-bg)",
@@ -79,6 +91,9 @@ export default function AegisDashboard() {
     background: accentDim,
     border: `1px solid ${accentGlow}`,
   };
+
+  if (loading) return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  if (!user) return <AuthLanding login={login} />;
 
   return (
     <>
@@ -145,6 +160,7 @@ export default function AegisDashboard() {
                     <DailyStreak t={t} accent={accent} accentCardStyle={accentCardStyle} />
                     <MasteryTrees t={t} accent={accent} cardStyle={cardStyle} />
                     <ActivityChart t={t} accent={accent} cardStyle={cardStyle} />
+                    <CalendarTicker t={t} accent={accent} accentCardStyle={accentCardStyle} events={events} mode={mode} />
                   </div>
                 ) : (
                   <div className="bento-grid">
@@ -153,6 +169,7 @@ export default function AegisDashboard() {
                     <IntegrityScore t={t} accent={accent} cardStyle={cardStyle} />
                     <LiveChallenge t={t} accent={accent} accentGlow={accentGlow} accentCardStyle={accentCardStyle} timer={timer} />
                     <StatsSidebar accent={accent} cardStyle={cardStyle} />
+                    <CalendarTicker t={t} accent={accent} accentCardStyle={accentCardStyle} events={events} mode={mode} />
                   </div>
                 )}
               </motion.div>
@@ -187,6 +204,18 @@ export default function AegisDashboard() {
                 <CommunityHub 
                   t={t} accent={accent} accentGlow={accentGlow} accentDim={accentDim} cardStyle={{...cardStyle, gridColumn: "span 12", minHeight: 400}}
                   userCollege={userCollege}
+                />
+              </motion.div>
+            )}
+
+            {activeView === "calendar" && (
+              <motion.div key="calendar"
+                initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                style={{ width: "100%", maxWidth: 1000, margin: "0 auto" }}
+              >
+                <GrowthCalendar 
+                   t={t} accent={accent} accentDim={accentDim} accentGlow={accentGlow} cardStyle={{...cardStyle, gridColumn: "span 12", minHeight: 400}}
+                   events={events} addEvent={addEvent} syncUniversityEvents={syncUniversityEvents} mode={mode} 
                 />
               </motion.div>
             )}

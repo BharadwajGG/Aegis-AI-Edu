@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Shield, Globe, ChevronDown, ChevronLeft, ChevronRight, 
-  Ghost, Settings, LayoutDashboard, Map, BrainCircuit, Users
+  Ghost, Settings, LayoutDashboard, Map, BrainCircuit, Users, CalendarDays
 } from "lucide-react";
 
 export function Sidebar({
@@ -20,6 +20,7 @@ export function Sidebar({
     { id: "overview", label: t.appName || "Overview", icon: <LayoutDashboard size={18} /> },
     { id: "roadmap", label: "AI Roadmap", icon: <Map size={18} /> },
     { id: "coach", label: "Concept Coach", icon: <BrainCircuit size={18} /> },
+    { id: "calendar", label: "Calendar", icon: <CalendarDays size={18} /> },
     { id: "community", label: "Community Hub", icon: <Users size={18} /> }
   ];
 
@@ -227,9 +228,14 @@ export function Sidebar({
                 border: `1px solid ${accent}66`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 12, fontWeight: 700, color: accent,
-                filter: isGhost ? "blur(4px)" : "none", transition: "filter 0.5s"
+                filter: isGhost ? "blur(4px)" : "none", transition: "filter 0.5s",
+                overflow: "hidden"
               }}>
-                {displayAvatar}
+                {displayAvatar && displayAvatar.includes('http') ? (
+                   <img src={displayAvatar} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                   displayAvatar
+                )}
               </div>
               <div style={{ fontSize: 12, fontWeight: 600, color: isGhost ? "#a78bfa" : "var(--text-main)" }}>
                 {isGhost ? "Ghost Mode" : "User Profile"}

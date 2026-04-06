@@ -1,4 +1,4 @@
-# Aegis Growth OS 🚀
+# Edge Edu (Aegis Growth OS) 🚀
 
 > **The Best Student Growth Operating System**
 
@@ -75,9 +75,9 @@ To experience Aegis on your local machine, you will need to start both the Front
 
 ### 2. Start the Frontend (React + Vite)
 
-1. Open a **new** terminal window and navigate to the frontend directory:
+1. Open a **new** terminal window and ensure you are in the project's root directory:
    ```bash
-   cd frontend
+   # You should be in the root folder, e.g., 'c:\Edge Edu'
    ```
 
 2. Install all required Node.js dependencies:

@@ -1,0 +1,22 @@
+[31mx[39m Build failed in 2.48s
+[31merror during build:
+[31msrc/components/dashboard/calendar/CalendarTicker.jsx (3:29): "CircleAlert" is not exported by "node_modules/lucide-react/dist/esm/lucide-react.js", imported by "src/components/dashboard/calendar/CalendarTicker.jsx".[31m
+file: [36mC:/Edge Edu/frontend/src/components/dashboard/calendar/CalendarTicker.jsx:3:29[31m
+[33m
+1: import React from 'react';
+2: import { motion, AnimatePresence } from 'framer-motion';
+3: import { CalendarDays, Bell, CircleAlert } from 'lucide-react';
+                                ^
+4: 
+5: export function CalendarTicker({ t, accent, accentCardStyle, events, mode }) {
+[31m
+    at getRollupError (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/parseAst.js:406:41)
+    at error (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/parseAst.js:402:42)
+    at Module.error (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/node-entry.js:17380:16)
+    at Module.traceVariable (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/node-entry.js:17813:29)
+    at ModuleScope.findVariable (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/node-entry.js:15403:39)
+    at FunctionScope.findVariable (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/node-entry.js:5676:38)
+    at FunctionBodyScope.findVariable (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/node-entry.js:5676:38)
+    at ReturnValueScope.findVariable (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/node-entry.js:5676:38)
+    at FunctionBodyScope.findVariable (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/node-entry.js:5676:38)
+    at Identifier.bind (file:///C:/Edge%20Edu/frontend/node_modules/rollup/dist/es/shared/node-entry.js:5450:40)[39m

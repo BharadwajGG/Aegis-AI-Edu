@@ -75,12 +75,14 @@ Do NOT include any extra text outside the JSON.
         )
         return json.loads(response.text)
     except Exception as e:
-        print(f"Error calling Gemini: {e}")
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error calling Gemini:\n{error_details}")
         # Send a fallback structured JSON on failure
         return {
             "roadmap": {
                 "title": f"Failed to generate roadmap for {goal}",
-                "summary": "Our AI service encountered an error. Please check your API key and try again.",
+                "summary": f"Error: {e}",
                 "phases": []
             }
         }
