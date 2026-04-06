@@ -53,8 +53,6 @@ export default function AegisDashboard() {
 
   const [ghostName] = useState(GHOST_NAMES[Math.floor(Math.random() * GHOST_NAMES.length)]);
   const [coachInput, setCoachInput] = useState("");
-  const [tick, setTick] = useState(0);
-  const timer = useTimer(847);
   const t = LANG[lang];
 
   const { user, login, logout, loading } = useAuth();
@@ -69,11 +67,6 @@ export default function AegisDashboard() {
   const accentDim = isGrowth ? "rgba(16,185,129,0.15)" : "rgba(244,63,94,0.15)";
   const accentGlow = isGrowth ? "rgba(16,185,129,0.3)" : "rgba(244,63,94,0.3)";
   const radius = isGrowth ? "24px" : "12px";
-
-  useEffect(() => {
-    const id = setInterval(() => setTick(x => x + 1), 3000);
-    return () => clearInterval(id);
-  }, []);
 
   const displayName = isGhost ? ghostName : activeDisplayName;
   const displayAvatar = isGhost ? null : (user?.photoURL || displayName.substring(0, 2).toUpperCase());
@@ -167,7 +160,7 @@ export default function AegisDashboard() {
                     <GlobalRank t={t} accent={accent} accentCardStyle={accentCardStyle} isGhost={isGhost} />
                     <LiveLeaderboard accent={accent} accentDim={accentDim} accentGlow={accentGlow} cardStyle={cardStyle} isGhost={isGhost} ghostName={ghostName} />
                     <IntegrityScore t={t} accent={accent} cardStyle={cardStyle} />
-                    <LiveChallenge t={t} accent={accent} accentGlow={accentGlow} accentCardStyle={accentCardStyle} timer={timer} />
+                    <LiveChallenge t={t} accent={accent} accentGlow={accentGlow} accentCardStyle={accentCardStyle} />
                     <StatsSidebar accent={accent} cardStyle={cardStyle} />
                     <CalendarTicker t={t} accent={accent} accentCardStyle={accentCardStyle} events={events} mode={mode} />
                   </div>

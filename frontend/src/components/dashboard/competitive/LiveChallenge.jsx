@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Zap, Clock } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTimer } from "../../../hooks/useTimer";
 
-export function LiveChallenge({ t, accent, accentGlow, accentCardStyle, timer }) {
+export function LiveChallenge({ t, accent, accentGlow, accentCardStyle }) {
   const [ans, setAns] = useState("");
+  const timer = useTimer(847);
 
   const submitDef = () => {
     if(!ans) return;
