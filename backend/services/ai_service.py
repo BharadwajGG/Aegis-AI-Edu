@@ -93,12 +93,30 @@ def generate_coach_response(prompt: str, system_prompt: str, api_key: str = None
     else:
         genai.configure(api_key=settings.GEMINI_API_KEY)
 
-    model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_prompt)
+    structured_prompt = f"""
+    You are an AI Concept Coach and expert tutor. 
+    The student needs help with: "{prompt}"
+    
+    You MUST output STRICTLY valid JSON matching exactly this syntax format:
+    {{
+      "hint1": "Provide a broad, conceptual stepping stone that helps them think about how to start.",
+      "hint2": "Provide a more specific hint, nudging them towards the correct mathematical or logical approach.",
+      "hint3": "Provide an explicit almost-giveaway hint that makes the solution obvious.",
+      "answer": "Provide the concise, highly optimized, and mathematically direct final answer."
+    }}
+    
+    Do NOT use Markdown formatting (No ```json). Start your output with {{ and end with }}.
+    """
+
+    model = genai.GenerativeModel('gemini-2.5-flash', system_instruction="You are a JSON-only API responding strictly according to schema.")
 
     try:
         response = model.generate_content(
-            prompt,
-            generation_config={"temperature": 0.7}
+            structured_prompt,
+            generation_config={
+                "temperature": 0.7,
+                "response_mime_type": "application/json"
+            }
         )
         return response.text
     except Exception as e:

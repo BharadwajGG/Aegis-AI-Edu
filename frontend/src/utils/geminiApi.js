@@ -29,7 +29,11 @@ export async function fetchConceptCoach(prompt, apiKey, systemPrompt) {
     }
 
     const data = await res.json();
-    return data.response;
+    let responseText = data.response;
+    if (responseText.startsWith("```json")) {
+      responseText = responseText.replace(/```json\n?/, "").replace(/```$/, "");
+    }
+    return JSON.parse(responseText);
   } catch (err) {
     console.error("Coach API Error:", err);
     throw err;

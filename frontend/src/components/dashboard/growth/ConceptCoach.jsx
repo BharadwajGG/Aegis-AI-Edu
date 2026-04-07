@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { Brain, Sparkles, Send, RefreshCw } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Brain, Sparkles, Send, RefreshCw, Key, Lightbulb, CheckCircle2 } from "lucide-react";
 import { PulseDot } from "../../ui/PulseDot";
 import { fetchConceptCoach } from "../../../utils/geminiApi";
 import toast from "react-hot-toast";
@@ -8,98 +8,169 @@ import toast from "react-hot-toast";
 export function ConceptCoach({ t, accent, accentGlow, cardStyle, apiKey, isCompetitive }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState(t.coachTip);
-  const [mode, setMode] = useState("socratic"); // "socratic" | "direct"
+  const [coachData, setCoachData] = useState(null);
+  const [unlockedHints, setUnlockedHints] = useState(0); // 0-4
+  const textareaRef = useRef(null);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
+    }
+  }, [input]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+    if (e) e.preventDefault();
+    if (!input.trim() || loading) return;
 
     setLoading(true);
-    setResponse(""); // Clear for loading state
+    setCoachData(null);
+    setUnlockedHints(0);
+    
     try {
-      const systemPrompt = mode === "socratic" 
-        ? "You are a concept coach. Do not directly give the final answer. Instead, provide hints based on the student's current understanding, ask thought-provoking questions, and give small quizzes to help them discover the answer themselves. Your goal is to make the core concepts clear through guided discovery." 
-        : "You are a competitive tutor. Give the concise, mathematically direct answer instantly.";
-      
-      const res = await fetchConceptCoach(input, apiKey, systemPrompt);
-      setResponse(res);
+      const res = await fetchConceptCoach(input, apiKey, "Progressive Coach");
+      if (typeof res === "string" && res.includes("Mock Mode Active")) {
+        // Fallback for mock strings if no API key
+        setCoachData({ hint1: res, hint2: "", hint3: "", answer: "" });
+      } else {
+        setCoachData(res);
+      }
+      setUnlockedHints(1); // Auto unlock hint 1
       setInput("");
     } catch (err) {
-      toast.error(err.message);
-      setResponse("Failed to connect to AI. Check your API key.");
+      toast.error(err.message || "Failed to load AI hints");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  const unlockNext = () => setUnlockedHints(prev => Math.min(prev + 1, 4));
+
   return (
-    <motion.div className={`bento-card ${isCompetitive ? 'md-col-span-12' : 'md-col-span-5'}`} style={{ ...cardStyle, padding: 24 }}>
+    <motion.div className={`bento-card ${isCompetitive ? 'md-col-span-12' : 'md-col-span-5'}`} style={{ ...cardStyle, padding: 24, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Brain size={14} color={accent} />
           <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2 }}>
-            {t.conceptCoach.toUpperCase()}
+            CONCEPT COACH
           </div>
           <PulseDot color={accent} />
         </div>
+      </div>
+
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12, marginBottom: 16, overflowY: "auto" }}>
         
-        {/* Toggle Mode */}
-        <div style={{ display: "flex", background: "var(--input-bg)", padding: 2, borderRadius: 6, border: "1px solid var(--input-border)" }}>
-          <button onClick={() => setMode("socratic")} style={{
-            fontSize: 10, padding: "4px 8px", borderRadius: 4, cursor: "pointer", border: "none",
-            background: mode === "socratic" ? accent : "transparent",
-            color: mode === "socratic" ? "#fff" : "var(--text-muted)", transition: "all 0.2s"
-          }}>Socratic</button>
-          <button onClick={() => setMode("direct")} style={{
-            fontSize: 10, padding: "4px 8px", borderRadius: 4, cursor: "pointer", border: "none",
-            background: mode === "direct" ? accent : "transparent",
-            color: mode === "direct" ? "#fff" : "var(--text-muted)", transition: "all 0.2s"
-          }}>Direct</button>
-        </div>
-      </div>
-
-      <div style={{
-        padding: "14px 16px", borderRadius: 12,
-        background: "var(--card-bg)",
-        border: `1px solid ${accentGlow}`,
-        marginBottom: 14, minHeight: 60,
-      }}>
-        <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-          {loading ? (
-             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} style={{ marginTop: 2, flexShrink: 0 }}>
-               <RefreshCw size={13} color={accent} />
-             </motion.div>
-          ) : (
-             <Sparkles size={13} color={accent} style={{ marginTop: 2, flexShrink: 0 }} />
-          )}
-          <div style={{ fontSize: 12, color: "var(--text-main)", lineHeight: 1.7 }}>
-            {loading ? "Thinking..." : response}
+        {/* Placeholder / Welcome state */}
+        {!coachData && !loading && (
+          <div style={{ padding: "20px", textAlign: "center", color: "var(--text-subtle)", fontSize: 13 }}>
+            Paste a complex problem, code snippet, or mathematical equation below. 
+            The AI will give you progressive hints instead of spoiling the answer immediately!
           </div>
-        </div>
+        )}
+
+        {/* Loading Spinner */}
+        {loading && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 16, color: accent }}>
+            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
+              <RefreshCw size={14} />
+            </motion.div>
+            <span style={{ fontSize: 12, fontWeight: 600 }}>Analyzing problem constraints...</span>
+          </div>
+        )}
+
+        {/* Sequential Rendered Content */}
+        {coachData && (
+          <AnimatePresence>
+            {unlockedHints >= 1 && coachData.hint1 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                style={{ padding: 16, background: "var(--card-bg)", border: `1px solid ${accentGlow}`, borderRadius: 12 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: accent, marginBottom: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <Lightbulb size={12} /> HINT 1: BROAD CONCEPT
+                </div>
+                <div style={{ fontSize: 13, color: "var(--text-main)", lineHeight: 1.6 }}>{coachData.hint1}</div>
+                {unlockedHints === 1 && (
+                  <button onClick={unlockNext} style={{ marginTop: 12, padding: "8px 12px", background: "var(--input-bg)", color: "var(--text-main)", border: "1px solid var(--input-border)", borderRadius: 8, fontSize: 11, cursor: "pointer", display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Key size={12} /> Unlock Hint 2
+                  </button>
+                )}
+              </motion.div>
+            )}
+
+            {unlockedHints >= 2 && coachData.hint2 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                style={{ padding: 16, background: "var(--card-bg)", border: `1px solid ${accentGlow}`, borderRadius: 12 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: accent, marginBottom: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <Lightbulb size={12} /> HINT 2: SPECIFIC APPROACH
+                </div>
+                <div style={{ fontSize: 13, color: "var(--text-main)", lineHeight: 1.6 }}>{coachData.hint2}</div>
+                {unlockedHints === 2 && (
+                  <button onClick={unlockNext} style={{ marginTop: 12, padding: "8px 12px", background: "var(--input-bg)", color: "var(--text-main)", border: "1px solid var(--input-border)", borderRadius: 8, fontSize: 11, cursor: "pointer", display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Key size={12} /> Unlock Hint 3
+                  </button>
+                )}
+              </motion.div>
+            )}
+
+            {unlockedHints >= 3 && coachData.hint3 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                style={{ padding: 16, background: "var(--card-bg)", border: `1px solid ${accentGlow}`, borderRadius: 12 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: accent, marginBottom: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <Lightbulb size={12} /> HINT 3: SOLUTION GUIDANCE
+                </div>
+                <div style={{ fontSize: 13, color: "var(--text-main)", lineHeight: 1.6 }}>{coachData.hint3}</div>
+                {unlockedHints === 3 && (
+                  <button onClick={unlockNext} style={{ marginTop: 12, padding: "8px 14px", background: accent, color: "#fff", border: "none", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <CheckCircle2 size={12} /> Reveal Direct Answer
+                  </button>
+                )}
+              </motion.div>
+            )}
+
+            {unlockedHints >= 4 && coachData.answer && (
+              <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
+                style={{ padding: 16, background: "rgba(16, 185, 129, 0.05)", border: `1px solid rgba(16, 185, 129, 0.3)`, borderRadius: 12 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#10b981", marginBottom: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <Sparkles size={12} /> FINAL OPTIMIZED ANSWER
+                </div>
+                <div style={{ fontSize: 13, color: "var(--text-main)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{coachData.answer}</div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
-        <input
+      <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+        <textarea
+          ref={textareaRef}
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder={t.coachPrompt}
+          onKeyDown={handleKeyDown}
+          placeholder="Describe your problem here... (Shift+Enter for new line)"
           disabled={loading}
           style={{
-            flex: 1, padding: "10px 14px", borderRadius: 10,
+            flex: 1, padding: "12px 14px", borderRadius: 10,
             background: "var(--input-bg)",
             border: "1px solid var(--input-border)",
-            color: "var(--text-main)", fontSize: 12,
-            outline: "none", opacity: loading ? 0.6 : 1, fontFamily: "inherit"
+            color: "var(--text-main)", fontSize: 13, lineHeight: 1.5,
+            outline: "none", opacity: loading ? 0.6 : 1, fontFamily: "inherit",
+            resize: "none", minHeight: "44px"
           }}
         />
         <button type="submit" disabled={loading} style={{
-          padding: "10px 16px", borderRadius: 10,
-          background: accent, border: "none",
+          padding: "12px 16px", borderRadius: 10, height: "44px",
+          background: accent, border: "none", flexShrink: 0,
           color: "#fff", fontSize: 12, cursor: "pointer", fontWeight: 600,
-          opacity: loading ? 0.6 : 1, display: "flex", alignItems: "center"
+          opacity: loading || !input.trim() ? 0.6 : 1, display: "flex", alignItems: "center"
         }}>
-          <Send size={14} />
+          <Send size={15} />
         </button>
       </form>
     </motion.div>
