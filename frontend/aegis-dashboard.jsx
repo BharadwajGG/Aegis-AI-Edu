@@ -52,7 +52,11 @@ export default function AegisDashboard() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [userName, setUserName] = useState("Aryan Desai");
   const [userCollege, setUserCollege] = useState("Maharashtra Institute of Technology (MIT)");
-  const [apiKey, setApiKey] = useState(() => window.localStorage.getItem("gemini_key") || "");
+  const [apiKey, setApiKey] = useState(() => {
+    const saved = window.localStorage.getItem("gemini_key");
+    if (saved === "AIzaSyAi39J90J6TLajkiXzEFBEq673DzZKiM1w") return "";
+    return saved || "";
+  });
   useEffect(() => window.localStorage.setItem("gemini_key", apiKey), [apiKey]);
 
   const [ghostName] = useState(GHOST_NAMES[Math.floor(Math.random() * GHOST_NAMES.length)]);
