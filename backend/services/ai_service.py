@@ -86,3 +86,23 @@ Do NOT include any extra text outside the JSON.
                 "phases": []
             }
         }
+
+def generate_coach_response(prompt: str, system_prompt: str, api_key: str = None) -> str:
+    if api_key:
+        genai.configure(api_key=api_key)
+    else:
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+
+    model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_prompt)
+
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config={"temperature": 0.7}
+        )
+        return response.text
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error calling Gemini for Coach:\n{error_details}")
+        return "Failed to connect to AI. Please check the API configuration on the backend."
