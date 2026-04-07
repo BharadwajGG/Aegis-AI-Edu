@@ -82,3 +82,9 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-subtle);
 }
+
+/* Fix dropdown option visibility on dark mode components */
+select option {
+  background-color: #111 !important;
+  color: #fff !important;
+}
