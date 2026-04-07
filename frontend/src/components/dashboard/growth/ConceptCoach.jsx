@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Sparkles, Send, RefreshCw, Key, Lightbulb, CheckCircle2 } from "lucide-react";
 import { PulseDot } from "../../ui/PulseDot";
 import { fetchConceptCoach } from "../../../utils/geminiApi";
+import { playPop, playSuccess } from "../../../utils/audioUtils";
 import toast from "react-hot-toast";
 
 export function ConceptCoach({ t, accent, accentGlow, cardStyle, apiKey, isCompetitive }) {
@@ -52,7 +53,14 @@ export function ConceptCoach({ t, accent, accentGlow, cardStyle, apiKey, isCompe
     }
   };
 
-  const unlockNext = () => setUnlockedHints(prev => Math.min(prev + 1, 4));
+  const unlockNext = () => {
+    setUnlockedHints(prev => {
+      const next = Math.min(prev + 1, 4);
+      if (next === 4) playSuccess();
+      else playPop();
+      return next;
+    });
+  };
 
   return (
     <motion.div className={`bento-card ${isCompetitive ? 'md-col-span-12' : 'md-col-span-5'}`} style={{ ...cardStyle, padding: 24, display: 'flex', flexDirection: 'column' }}>
