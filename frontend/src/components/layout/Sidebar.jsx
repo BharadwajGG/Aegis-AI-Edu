@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Shield, Globe, ChevronDown, ChevronLeft, ChevronRight, 
+  Shield, Globe, ChevronDown, ChevronLeft, ChevronRight, X,
   Ghost, Settings, LayoutDashboard, Map, BrainCircuit, Users, CalendarDays
 } from "lucide-react";
 
@@ -13,7 +13,8 @@ export function Sidebar({
   displayAvatar,
   openSettings,
   activeView, setActiveView,
-  collapsed, setCollapsed
+  collapsed, setCollapsed,
+  isMobile, mobileOpen, setMobileOpen
 }) {
   
   const navItems = [
@@ -26,7 +27,11 @@ export function Sidebar({
 
   return (
     <motion.div 
-      animate={{ width: collapsed ? 80 : 260 }}
+      initial={false}
+      animate={{ 
+        width: isMobile ? 260 : (collapsed ? 80 : 260),
+        x: isMobile ? (mobileOpen ? 0 : -260) : 0
+      }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       style={{
         position: "fixed", top: 0, left: 0, bottom: 0, zIndex: 50,
@@ -42,8 +47,8 @@ export function Sidebar({
       {/* --- TOP: BRANDING & NAVIGATION --- */}
       <div>
         {/* Logo & Toggle */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: collapsed ? "center" : "space-between", marginBottom: 40, padding: "0 8px" }}>
-          {!collapsed && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: (collapsed && !isMobile) ? "center" : "space-between", marginBottom: 40, padding: "0 8px" }}>
+          {(!collapsed || isMobile) && (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{
                 width: 32, height: 32, borderRadius: 8,
@@ -60,7 +65,7 @@ export function Sidebar({
             </div>
           )}
           
-          {collapsed && (
+          {(collapsed && !isMobile) && (
             <div style={{
               width: 32, height: 32, borderRadius: 8,
               background: `linear-gradient(135deg, ${accent}, transparent)`,
@@ -74,14 +79,14 @@ export function Sidebar({
           )}
 
           <button 
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={() => isMobile ? setMobileOpen(false) : setCollapsed(!collapsed)}
             style={{
               background: "transparent", border: "none", cursor: "pointer",
               color: "var(--text-subtle)", padding: 4, display: "flex", alignItems: "center",
-              position: collapsed ? "absolute" : "static", top: collapsed ? 70 : "auto"
+              position: (collapsed && !isMobile) ? "absolute" : "static", top: (collapsed && !isMobile) ? 70 : "auto"
             }}
           >
-            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            {isMobile ? <X size={18} /> : (collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />)}
           </button>
         </div>
 
@@ -90,7 +95,7 @@ export function Sidebar({
           {navItems.map(item => {
             const isActive = activeView === item.id;
             return (
-              <button key={item.id} onClick={() => setActiveView(item.id)}
+              <button key={item.id} onClick={() => { setActiveView(item.id); if (isMobile) setMobileOpen(false); }}
                 style={{
                   display: "flex", alignItems: "center", gap: 14,
                   padding: "12px 16px", borderRadius: 12,
@@ -98,7 +103,7 @@ export function Sidebar({
                   color: isActive ? accent : "var(--text-subtle)",
                   border: isActive ? `1px solid ${accentGlow}` : "1px solid transparent",
                   cursor: "pointer", transition: "all 0.3s ease",
-                  justifyContent: collapsed ? "center" : "flex-start",
+                  justifyContent: (collapsed && !isMobile) ? "center" : "flex-start",
                   position: "relative", overflow: "hidden"
                 }}
               >
@@ -108,7 +113,7 @@ export function Sidebar({
                   />
                 )}
                 <div style={{ flexShrink: 0 }}>{item.icon}</div>
-                {!collapsed && (
+                {(!collapsed || isMobile) && (
                   <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 500, letterSpacing: 1 }}>
                     {item.label}
                   </div>
@@ -123,7 +128,7 @@ export function Sidebar({
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         
         {/* Language & Settings Row */}
-        {!collapsed && (
+        {(!collapsed || isMobile) && (
            <div style={{ display: "flex", gap: 8, padding: "0 8px" }}>
             <div style={{ position: "relative", flex: 1 }}>
               <button
@@ -176,7 +181,7 @@ export function Sidebar({
         )}
 
         {/* Short Controls Row (when collapsed) */}
-        {collapsed && (
+        {(collapsed && !isMobile) && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
             <button onClick={() => setLangOpen(o => !o)} style={{
               width: 36, height: 36, borderRadius: 8, background: "var(--input-bg)", border: "1px solid var(--input-border)",
@@ -195,32 +200,32 @@ export function Sidebar({
 
         {/* Mode Switcher */}
         <div style={{
-          display: "flex", flexDirection: collapsed ? "column" : "row",
+          display: "flex", flexDirection: (collapsed && !isMobile) ? "column" : "row",
           background: "var(--input-bg)",
           border: "1px solid var(--input-border)", borderRadius: 10, padding: 3,
         }}>
           {["growth", "competitive"].map(m => (
             <button key={m} onClick={() => setMode(m)}
               style={{
-                flex: 1, padding: collapsed ? "10px 0" : "7px 0", borderRadius: 8, fontSize: 10, letterSpacing: 0.5,
+                flex: 1, padding: (collapsed && !isMobile) ? "10px 0" : "7px 0", borderRadius: 8, fontSize: 10, letterSpacing: 0.5,
                 cursor: "pointer", transition: "all 0.4s ease", fontWeight: 600,
                 background: mode === m ? (m === "growth" ? "#10b981" : "#f43f5e") : "transparent",
                 color: mode === m ? "#fff" : "var(--text-muted)", border: "none",
                 display: "flex", alignItems: "center", justifyContent: "center"
               }}>
-              {collapsed ? m[0].toUpperCase() : (m === "growth" ? t.growth : t.competitive)}
+              {(collapsed && !isMobile) ? m[0].toUpperCase() : (m === "growth" ? t.growth : t.competitive)}
             </button>
           ))}
         </div>
 
         {/* User / Ghost Box */}
         <div style={{
-          display: "flex", alignItems: "center", justifyContent: collapsed ? "center" : "space-between",
+          display: "flex", alignItems: "center", justifyContent: (collapsed && !isMobile) ? "center" : "space-between",
           padding: "10px", borderRadius: 12,
           background: isGhost ? "rgba(139,92,246,0.1)" : "var(--input-bg)",
           border: isGhost ? "1px solid rgba(139,92,246,0.3)" : "1px solid var(--input-border)"
         }}>
-          {!collapsed && (
+          {(!collapsed || isMobile) && (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{
                 width: 32, height: 32, borderRadius: 8,

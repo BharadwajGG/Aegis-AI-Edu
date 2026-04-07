@@ -14,6 +14,8 @@ import { ModeIndicator } from "./src/components/layout/ModeIndicator";
 import { SettingsModal } from "./src/components/layout/SettingsModal";
 import { AuthLanding } from "./src/components/layout/AuthLanding";
 import { useAuth } from "./src/hooks/useAuth";
+import { useIsMobile } from "./src/hooks/useIsMobile";
+import { Menu } from "lucide-react";
 
 import { DailyStreak } from "./src/components/dashboard/growth/DailyStreak";
 import { MasteryTrees } from "./src/components/dashboard/growth/MasteryTrees";
@@ -43,6 +45,8 @@ export default function AegisDashboard() {
   // Sidebar & View States
   const [activeView, setActiveView] = useState("overview");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   // Settings & Profile
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -119,7 +123,7 @@ export default function AegisDashboard() {
         
         {/* Static Sidebar spacer so the fixed absolute Sidebar doesn't overlap text */}
         <motion.div 
-          animate={{ width: sidebarCollapsed ? 80 : 260 }}
+          animate={{ width: isMobile ? 0 : (sidebarCollapsed ? 80 : 260) }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           style={{ flexShrink: 0 }}
         />
@@ -133,12 +137,36 @@ export default function AegisDashboard() {
           openSettings={() => setSettingsOpen(true)}
           activeView={activeView} setActiveView={setActiveView}
           collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed}
+          isMobile={isMobile} mobileOpen={mobileMenuOpen} setMobileOpen={setMobileMenuOpen}
         />
+        
+        {/* Mobile Backdrop */}
+        {isMobile && mobileMenuOpen && (
+          <div 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ position: "fixed", inset: 0, zIndex: 40, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
+          />
+        )}
 
         {/* Main Content Area */}
-        <div style={{ flex: 1, position: "relative", zIndex: 2, padding: "40px 60px" }}>
+        <div style={{ flex: 1, position: "relative", zIndex: 2, padding: isMobile ? "20px 16px" : "40px 60px" }}>
           
-          <UserWelcome t={t} displayName={displayName} isGhost={isGhost} />
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: isMobile ? 16 : 0 }}>
+            {isMobile && (
+              <button 
+                onClick={() => setMobileMenuOpen(true)}
+                style={{ 
+                  background: "var(--input-bg)", border: "1px solid var(--input-border)", 
+                  color: "var(--text-main)", padding: 8, borderRadius: 8, cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>
+                <Menu size={20} />
+              </button>
+            )}
+            <div style={{ flex: 1 }}>
+              <UserWelcome t={t} displayName={displayName} isGhost={isGhost} />
+            </div>
+          </div>
 
           {/* ── CONDITIONAL VIEWS ── */}
           <AnimatePresence mode="wait">

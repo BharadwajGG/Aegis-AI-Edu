@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldAlert } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 export function AuthLanding({ login }) {
   const [loading, setLoading] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleLogin = async () => {
     setLoading(true);
@@ -21,7 +23,7 @@ export function AuthLanding({ login }) {
           background: "radial-gradient(ellipse 60% 40% at 50% -20%, rgba(16,185,129,0.15) 0%, transparent 70%)"
         }} />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} 
-        style={{ padding: 40, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, textAlign: 'center', maxWidth: 400, zIndex: 1, backdropFilter: 'blur(20px)' }}>
+        style={{ padding: isMobile ? 24 : 40, width: "90%", maxWidth: 400, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, textAlign: 'center', zIndex: 1, backdropFilter: 'blur(20px)' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
            <div style={{ padding: 16, background: 'rgba(16,185,129,0.1)', borderRadius: '50%', color: '#10b981' }}>
              <ShieldAlert size={40} />
