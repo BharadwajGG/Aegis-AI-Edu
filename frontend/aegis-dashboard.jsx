@@ -23,6 +23,7 @@ import { ActivityChart } from "./src/components/dashboard/growth/ActivityChart";
 import { ConceptCoach } from "./src/components/dashboard/growth/ConceptCoach";
 import { AIRoadmapCard } from "./src/components/dashboard/growth/AIRoadmapCard";
 import { CommunityHub } from "./src/components/dashboard/growth/CommunityHub";
+import { ConsistencyTracker } from "./src/components/dashboard/growth/ConsistencyTracker";
 import { GrowthCalendar } from "./src/components/dashboard/calendar/GrowthCalendar";
 import { CalendarTicker } from "./src/components/dashboard/calendar/CalendarTicker";
 import { useCalendarEngine } from "./src/hooks/useCalendarEngine";
@@ -186,6 +187,7 @@ export default function AegisDashboard() {
                     <MasteryTrees t={t} accent={accent} cardStyle={cardStyle} />
                     <ActivityChart t={t} accent={accent} cardStyle={cardStyle} />
                     <CalendarTicker t={t} accent={accent} accentCardStyle={accentCardStyle} events={events} mode={mode} />
+                    <ConsistencyTracker t={t} accent={accent} cardStyle={cardStyle} />
                   </div>
                 ) : (
                   <div className="bento-grid">
