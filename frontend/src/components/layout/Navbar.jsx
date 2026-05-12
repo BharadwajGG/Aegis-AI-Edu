@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Shield } from "lucide-react";
 import { navLinks } from "../../constants/navLinks";
 
-export function Navbar({ activeView, setActiveView, theme, toggleTheme, user, userRole, logout }) {
+export function Navbar({ activeView, setActiveView, theme, toggleTheme, user, userRole, logout, onProfileClick }) {
   const [openMobileMenu, setOpenMobileMenu] = useState(false);
 
   useEffect(() => {
@@ -66,10 +66,18 @@ export function Navbar({ activeView, setActiveView, theme, toggleTheme, user, us
 
         {user ? (
           <button 
-            onClick={logout}
-            className="hidden md:flex h-10 px-6 bg-white/5 hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-300 hover:text-red-400 transition-all rounded-xl items-center text-xs font-bold uppercase tracking-widest"
+            onClick={onProfileClick}
+            className="flex items-center gap-2 p-1 pr-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all group"
           >
-            Logout
+            <img 
+              src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || 'User'}&background=7c3aed&color=fff`} 
+              alt="Avatar" 
+              className="size-8 rounded-xl border border-white/10 shadow-lg group-hover:scale-105 transition-transform"
+            />
+            <div className="hidden lg:block text-left">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Profile</p>
+              <p className="text-[11px] font-bold text-white leading-none">{user.displayName || 'Student'}</p>
+            </div>
           </button>
         ) : (
           <button className="hidden md:flex h-10 px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-xl items-center text-xs font-bold uppercase tracking-widest shadow-lg shadow-purple-600/20 transition-all">

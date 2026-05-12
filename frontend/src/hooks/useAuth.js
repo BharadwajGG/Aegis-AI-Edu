@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { auth, db, signInWithGoogle, signOutAccount, isConfigured } from "../utils/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { auth, db, signInWithGoogle, signInWithGoogleRedirect, signOutAccount, isConfigured } from "../utils/firebase";
+import { onAuthStateChanged, getRedirectResult } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export function useAuth() {
@@ -25,23 +25,45 @@ export function useAuth() {
       setLoading(false);
       return;
     }
-    
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        // Fetch role from Firestore
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setUserRole(data.role);
-          setUser({ ...currentUser, role: data.role });
-        } else {
-          setUser(currentUser);
-        }
-      } else {
-        setUser(null);
-        setUserRole(null);
+
+    // Handle redirect results
+    getRedirectResult(auth).then((result) => {
+      if (result) {
+        handleUserResponse(result.user);
       }
-      setLoading(false);
+    }).catch((error) => {
+      console.error("Redirect Auth Error:", error);
+    });
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      try {
+        if (currentUser) {
+          // Fetch role from Firestore with a timeout/error safety
+          const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            setUserRole(data.role);
+            setUser({ ...currentUser, role: data.role });
+          } else {
+            // Check local storage for fallback
+            const savedRole = localStorage.getItem("aegis_mock_role");
+            if (savedRole) {
+              setUserRole(savedRole);
+              setUser({ ...currentUser, role: savedRole });
+            } else {
+              setUser(currentUser);
+            }
+          }
+        } else {
+          setUser(null);
+          setUserRole(null);
+        }
+      } catch (error) {
+        console.error("Auth State Sync Error:", error);
+        // Fallback: still set the user so they aren't stuck on the loading screen
+        if (currentUser) setUser(currentUser);
+      } finally {
+        setLoading(false);
+      }
     });
 
     return () => unsubscribe();
@@ -50,28 +72,60 @@ export function useAuth() {
   const login = async () => {
     try {
       const res = await signInWithGoogle();
-      if (isConfigured && res.user) {
-        const userDoc = await getDoc(doc(db, "users", res.user.uid));
-        if (userDoc.exists()) {
-          setUserRole(userDoc.data().role);
-          setUser({ ...res.user, role: userDoc.data().role });
-        } else {
-          setUser(res.user);
-        }
-      } else {
-        setUser(res.user);
-        if (!isConfigured) {
-          localStorage.setItem("aegis_mock_login", "true");
-          const savedRole = localStorage.getItem("aegis_mock_role");
-          setUserRole(savedRole);
-          setUser(prev => ({ ...prev, role: savedRole }));
-        }
-      }
-      return res.user;
+      return handleUserResponse(res.user);
     } catch (error) {
       console.error(error);
       throw error;
     }
+  };
+
+  const emailLogin = async (email, password) => {
+    try {
+      const { signInEmail } = await import("../utils/firebase");
+      const res = await signInEmail(email, password);
+      return handleUserResponse(res.user);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
+  const emailSignup = async (email, password) => {
+    try {
+      const { signUpEmail } = await import("../utils/firebase");
+      const res = await signUpEmail(email, password);
+      return handleUserResponse(res.user);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
+  const handleUserResponse = async (currentUser) => {
+    if (isConfigured && currentUser) {
+      try {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setUserRole(data.role);
+          setUser({ ...currentUser, role: data.role });
+        } else {
+          setUser(currentUser);
+        }
+      } catch (error) {
+        console.error("Manual Response Sync Error:", error);
+        setUser(currentUser);
+      }
+    } else {
+      setUser(currentUser);
+      if (!isConfigured) {
+        localStorage.setItem("aegis_mock_login", "true");
+        const savedRole = localStorage.getItem("aegis_mock_role");
+        setUserRole(savedRole);
+        setUser(prev => ({ ...prev, role: savedRole }));
+      }
+    }
+    return currentUser;
   };
 
   const logout = async () => {
@@ -85,19 +139,36 @@ export function useAuth() {
   };
 
   const setRole = async (role) => {
-    if (isConfigured && user) {
-      await setDoc(doc(db, "users", user.uid), {
-        role,
-        email: user.email,
-        displayName: user.displayName,
-        updatedAt: new Date()
-      }, { merge: true });
-    } else {
+    try {
+      if (isConfigured && user) {
+        await setDoc(doc(db, "users", user.uid), {
+          role,
+          email: user.email,
+          displayName: user.displayName || user.email.split('@')[0],
+          updatedAt: new Date()
+        }, { merge: true });
+      } else {
+        localStorage.setItem("aegis_mock_role", role);
+      }
+    } catch (error) {
+      console.error("Failed to save role to Firestore:", error);
+      // Fallback to local storage so the user isn't stuck
       localStorage.setItem("aegis_mock_role", role);
     }
+    
+    // Always update local state so the UI proceeds
     setUserRole(role);
     setUser(prev => ({ ...prev, role }));
   };
 
-  return { user, login, logout, loading, userRole, setRole };
+  const loginRedirect = async () => {
+    try {
+      await signInWithGoogleRedirect();
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
+  return { user, login, loginRedirect, emailLogin, emailSignup, logout, loading, userRole, setRole };
 }

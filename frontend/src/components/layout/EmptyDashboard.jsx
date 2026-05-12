@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Construction } from "lucide-react";
 
 export function EmptyDashboard({ role, accent }) {
-  const roleName = role.charAt(0).toUpperCase() + role.slice(1);
+  const roleName = role ? role.charAt(0).toUpperCase() + role.slice(1) : "User";
   
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-8">

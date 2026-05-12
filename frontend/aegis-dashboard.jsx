@@ -18,6 +18,7 @@ import { SettingsModal } from "./src/components/layout/SettingsModal";
 import { AuthLanding } from "./src/components/layout/AuthLanding";
 import { RoleSelection } from "./src/components/layout/RoleSelection";
 import { EmptyDashboard } from "./src/components/layout/EmptyDashboard";
+import { ProfileModal } from "./src/components/layout/ProfileModal";
 
 import { DailyStreak } from "./src/components/dashboard/growth/DailyStreak";
 import { MasteryTrees } from "./src/components/dashboard/growth/MasteryTrees";
@@ -44,11 +45,12 @@ export default function AegisDashboard() {
   const [lang, setLang] = useState("en");
   const [activeView, setActiveView] = useState("overview");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [userName, setUserName] = useState("Aryan Desai");
   const [userCollege, setUserCollege] = useState("Maharashtra Institute of Technology (MIT)");
   const isMobile = useIsMobile();
   
-  const { user, login, logout, loading, userRole, setRole } = useAuth();
+  const { user, login, loginRedirect, emailLogin, emailSignup, logout, loading, userRole, setRole } = useAuth();
 
   const [apiKey, setApiKey] = useState(() => {
     const saved = window.localStorage.getItem("gemini_key");
@@ -60,7 +62,7 @@ export default function AegisDashboard() {
 
   const [ghostName] = useState(GHOST_NAMES[Math.floor(Math.random() * GHOST_NAMES.length)]);
   const [coachInput, setCoachInput] = useState("");
-  const t = LANG[lang];
+  const t = LANG[lang] || LANG.en;
   
   const activeUserEmail = user ? user.email : "student@example.edu";
   const activeDisplayName = user ? user.displayName : userName;
@@ -89,7 +91,7 @@ export default function AegisDashboard() {
   const isStudent = userRole === "student";
 
   if (loading) return <SplashScreen onComplete={() => setShowSplash(false)} />;
-  if (!user) return <AuthLanding login={login} />;
+  if (!user) return <AuthLanding login={login} loginRedirect={loginRedirect} emailLogin={emailLogin} emailSignup={emailSignup} />;
   
   // If user is logged in but hasn't selected a role, show RoleSelection
   if (!userRole) {
@@ -112,6 +114,7 @@ export default function AegisDashboard() {
           user={user} 
           userRole={userRole}
           logout={logout} 
+          onProfileClick={() => setProfileOpen(true)}
         />
 
         {/* Hero Background Gradient */}
@@ -257,10 +260,18 @@ export default function AegisDashboard() {
             theme={theme} toggleTheme={toggleTheme}
             userName={userName} setUserName={setUserName}
             apiKey={apiKey} setApiKey={setApiKey}
+            lang={lang} setLang={setLang}
             accent={accent} accentGlow={accentGlow}
           />
         )}
       </AnimatePresence>
+      <ProfileModal 
+        user={user} 
+        userRole={userRole} 
+        isOpen={profileOpen} 
+        onClose={() => setProfileOpen(false)} 
+        logout={logout}
+      />
     </SmoothScroll>
   );
 }

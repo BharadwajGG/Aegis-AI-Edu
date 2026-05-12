@@ -50,11 +50,12 @@ The backend handles AI roadmap generation and concept coaching using the Gemini 
     GEMINI_API_KEY=your_api_key_here
     ```
 
-6.  **Run the backend server:**
-    ```bash
-    python -m uvicorn main:app --reload
-    ```
-    The backend will be available at `http://localhost:8000`.
+### 3. Setup Authentication (Firebase)
+To enable real-time authentication:
+1. Create a project at [Firebase Console](https://console.firebase.google.com/).
+2. Enable **Authentication** (Google & Email/Password).
+3. Create a **Firestore** database.
+4. Copy `frontend/.env.example` to `frontend/.env` and fill in your credentials.
 
 ---
 

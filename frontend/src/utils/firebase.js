@@ -1,6 +1,16 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
+  signOut as firebaseSignOut,
+  createUserWithEmailAndPassword as firebaseCreateUser,
+  signInWithEmailAndPassword as firebaseSignIn
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -8,14 +18,17 @@ const firebaseConfig = {
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 const isConfigured = Boolean(firebaseConfig.apiKey);
 
 const app = isConfigured ? initializeApp(firebaseConfig) : null;
 const auth = isConfigured ? getAuth(app) : null;
+if (auth) auth.useDeviceLanguage();
 const db = isConfigured ? getFirestore(app) : null;
+const analytics = isConfigured ? getAnalytics(app) : null;
 const googleProvider = isConfigured ? new GoogleAuthProvider() : null;
 
 // Mock user logic for graceful degradation if keys aren't added yet!
@@ -28,8 +41,7 @@ const mockUser = {
 
 export const signInWithGoogle = async () => {
   if (!isConfigured) {
-    console.warn("Firebase not configured. Proceeding with Mock Authentication.");
-    return { user: mockUser };
+    throw new Error("FIREBASE_NOT_CONFIGURED");
   }
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -40,9 +52,24 @@ export const signInWithGoogle = async () => {
   }
 };
 
+export const signUpEmail = async (email, password) => {
+  if (!isConfigured) return { user: { ...mockUser, email } };
+  return firebaseCreateUser(auth, email, password);
+};
+
+export const signInEmail = async (email, password) => {
+  if (!isConfigured) return { user: { ...mockUser, email } };
+  return firebaseSignIn(auth, email, password);
+};
+
 export const signOutAccount = async () => {
   if (!isConfigured) return;
   return firebaseSignOut(auth);
+};
+
+export const signInWithGoogleRedirect = async () => {
+  if (!isConfigured) throw new Error("FIREBASE_NOT_CONFIGURED");
+  return signInWithRedirect(auth, googleProvider);
 };
 
 export { auth, db, isConfigured };
