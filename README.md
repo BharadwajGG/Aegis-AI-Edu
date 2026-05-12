@@ -1,4 +1,4 @@
-# Aegis AI - Student Growth OS
+# Aegis AI - Student Growth OS <!-- sync-verify: 2026-05-12T13:17:30 -->
 
 Aegis AI is a premium, AI-powered education dashboard designed for students to master complex concepts, generate intelligent roadmaps, and track their performance in real-time.
 
