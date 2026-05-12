@@ -1,1 +1,40 @@
-node_modules
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/venv/
+venv/
+env/
+.env
+backend/.env
+frontend/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# IDEs
+.vscode/
+.idea/
+
+# Build/Dist
+dist/
+build/
+*.zip
+# Redundant projects
+reactjs/
+frontend/reactjs/
+frontend/reactjs/src/
+frontend/reactjs/public/
+frontend/reactjs/package.json
+frontend/reactjs/package-lock.json
+frontend/reactjs/vite.config.js
+frontend/reactjs/eslint.config.js
+frontend/reactjs/index.html
+frontend/reactjs/README.md
+frontend/reactjs/.gitignore
+
+# System Files
+.DS_Store
+Thumbs.db

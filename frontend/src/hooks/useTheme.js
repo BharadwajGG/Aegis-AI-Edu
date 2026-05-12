@@ -10,6 +10,11 @@ export function useTheme() {
   useEffect(() => {
     // Apply theme to document
     document.documentElement.setAttribute("data-theme", theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     // Save to local storage
     window.localStorage.setItem("aegis-theme", theme);
   }, [theme]);

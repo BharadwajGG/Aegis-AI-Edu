@@ -15,64 +15,42 @@ export function LiveChallenge({ t, accent, accentGlow, accentCardStyle }) {
   }
 
   return (
-    <motion.div className="bento-card md-col-span-8" style={{ ...accentCardStyle, padding: 24 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Zap size={14} color={accent} />
-          <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2 }}>
-            {t.liveChallenge.toUpperCase()}
+    <motion.div className="bento-card md-col-span-8 p-8" style={accentCardStyle}>
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
+            <Zap size={20} />
           </div>
-          <div style={{
-            padding: "2px 8px", borderRadius: 4,
-            background: "rgba(244,63,94,0.2)", border: "1px solid rgba(244,63,94,0.3)",
-            fontSize: 9, color: accent, letterSpacing: 1,
-          }}>RANKED</div>
+          <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+            {t.liveChallenge}
+          </div>
+          <div className="px-2 py-0.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[8px] font-black text-rose-500 tracking-widest uppercase">Ranked</div>
         </div>
-        <div style={{
-          display: "flex", alignItems: "center", gap: 8,
-          padding: "6px 14px", borderRadius: 6,
-          background: "var(--input-bg)", border: `1px solid ${accentGlow}`,
-        }}>
-          <Clock size={11} color={accent} />
-          <span style={{ fontSize: 16, fontWeight: 900, color: accent, fontVariantNumeric: "tabular-nums" }}>
+        <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 ring-1 ring-purple-500/10">
+          <Clock size={14} className="text-purple-500" />
+          <span className="text-xl font-black tracking-tighter text-purple-400 tabular-nums">
             {timer}
           </span>
         </div>
       </div>
 
-      <div style={{
-        padding: "18px 20px", borderRadius: 8,
-        background: "var(--input-bg)", border: "1px solid var(--input-border)",
-        marginBottom: 16,
-      }}>
-        <div style={{ fontSize: 11, color: "var(--text-subtle)", letterSpacing: 1, marginBottom: 10 }}>
-          {t.challengeLabel.toUpperCase()} · CALCULUS II
+      <div className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 mb-8">
+        <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-3">
+          {t.challengeLabel} · Calculus II
         </div>
-        <div style={{ fontSize: 14, color: "var(--text-main)", lineHeight: 1.7, fontStyle: "italic" }}>
-          {t.challengeQ}
+        <div className="text-lg text-slate-200 leading-relaxed italic font-medium">
+          "{t.challengeQ}"
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 10 }}>
+      <div className="flex gap-3">
         <input
           placeholder="f(x) = ..."
           value={ans}
           onChange={e => setAns(e.target.value)}
-          style={{
-            flex: 1, padding: "12px 16px", borderRadius: 6,
-            background: "var(--bg-main)",
-            border: "1px solid var(--input-border)",
-            color: "var(--text-main)", fontSize: 13, outline: "none",
-            fontFamily: "'IBM Plex Mono', monospace",
-          }}
+          className="flex-1 px-5 py-4 rounded-xl border border-slate-800 bg-slate-900/30 text-white text-sm outline-none focus:ring-2 focus:ring-purple-500/50 transition-all placeholder:text-slate-600 font-mono"
         />
-        <button onClick={submitDef} style={{
-          padding: "12px 20px", borderRadius: 6,
-          background: accent, border: "none",
-          color: "#fff", fontSize: 12, cursor: "pointer",
-          fontWeight: 700, letterSpacing: 1,
-          boxShadow: `0 0 20px ${accentGlow}`,
-        }}>
+        <button onClick={submitDef} className="px-8 py-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow-lg shadow-purple-600/20 active:scale-[0.98] transition-all whitespace-nowrap">
           {t.submit}
         </button>
       </div>

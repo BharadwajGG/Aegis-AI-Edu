@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, Sparkles, Send, RefreshCw, Key, Lightbulb, CheckCircle2 } from "lucide-react";
+import { Brain, Sparkles, Send, RefreshCw, Key, Lightbulb } from "lucide-react";
 import { PulseDot } from "../../ui/PulseDot";
 import { fetchConceptCoach } from "../../../utils/geminiApi";
 import { playPop, playSuccess } from "../../../utils/audioUtils";
@@ -32,7 +32,6 @@ export function ConceptCoach({ t, accent, accentGlow, cardStyle, apiKey, isCompe
     try {
       const res = await fetchConceptCoach(input, apiKey, "Progressive Coach");
       if (typeof res === "string" && res.includes("Mock Mode Active")) {
-        // Fallback for mock strings if no API key
         setCoachData({ hint1: res, hint2: "", hint3: "", answer: "" });
       } else {
         setCoachData(res);
@@ -63,122 +62,93 @@ export function ConceptCoach({ t, accent, accentGlow, cardStyle, apiKey, isCompe
   };
 
   return (
-    <motion.div className={`bento-card ${isCompetitive ? 'md-col-span-12' : 'md-col-span-5'}`} style={{ ...cardStyle, padding: 24, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Brain size={14} color={accent} />
-          <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2 }}>
-            CONCEPT COACH
+    <motion.div className={`bento-card p-8 flex flex-col ${isCompetitive ? 'md-col-span-12' : 'md-col-span-5'}`} style={cardStyle}>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
+            <Brain size={20} />
+          </div>
+          <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+            Concept Coach
           </div>
           <PulseDot color={accent} />
         </div>
       </div>
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12, marginBottom: 16, overflowY: "auto" }}>
-        
-        {/* Placeholder / Welcome state */}
+      <div className="flex-1 flex flex-col gap-4 mb-8 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
         {!coachData && !loading && (
-          <div style={{ padding: "20px", textAlign: "center", color: "var(--text-subtle)", fontSize: 13 }}>
-            Paste a complex problem, code snippet, or mathematical equation below. 
-            The AI will give you progressive hints instead of spoiling the answer immediately!
+          <div className="flex flex-col items-center justify-center h-full text-center p-6 bg-slate-900/20 rounded-[24px] border border-slate-800/50">
+            <Lightbulb className="text-purple-500/50 mb-4" size={40} />
+            <p className="text-sm text-slate-400 leading-relaxed max-w-[240px]">
+              Paste a complex problem below. The AI will give you progressive hints instead of spoiling the answer immediately!
+            </p>
           </div>
         )}
 
-        {/* Loading Spinner */}
         {loading && (
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 16, color: accent }}>
-            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
-              <RefreshCw size={14} />
-            </motion.div>
-            <span style={{ fontSize: 12, fontWeight: 600 }}>Analyzing problem constraints...</span>
+          <div className="flex items-center gap-3 p-5 bg-purple-500/5 rounded-2xl border border-purple-500/10 text-purple-400">
+            <RefreshCw size={18} className="animate-spin" />
+            <span className="text-xs font-bold uppercase tracking-wider">Analyzing problem constraints...</span>
           </div>
         )}
 
-        {/* Sequential Rendered Content */}
         {coachData && (
           <AnimatePresence>
-            {unlockedHints >= 1 && coachData.hint1 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                style={{ padding: 16, background: "var(--card-bg)", border: `1px solid ${accentGlow}`, borderRadius: 12 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: accent, marginBottom: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <Lightbulb size={12} /> HINT 1: BROAD CONCEPT
-                </div>
-                <div style={{ fontSize: 13, color: "var(--text-main)", lineHeight: 1.6 }}>{coachData.hint1}</div>
-                {unlockedHints === 1 && (
-                  <button onClick={unlockNext} style={{ marginTop: 12, padding: "8px 12px", background: "var(--input-bg)", color: "var(--text-main)", border: "1px solid var(--input-border)", borderRadius: 8, fontSize: 11, cursor: "pointer", display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Key size={12} /> Unlock Hint 2
-                  </button>
-                )}
-              </motion.div>
-            )}
-
-            {unlockedHints >= 2 && coachData.hint2 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                style={{ padding: 16, background: "var(--card-bg)", border: `1px solid ${accentGlow}`, borderRadius: 12 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: accent, marginBottom: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <Lightbulb size={12} /> HINT 2: SPECIFIC APPROACH
-                </div>
-                <div style={{ fontSize: 13, color: "var(--text-main)", lineHeight: 1.6 }}>{coachData.hint2}</div>
-                {unlockedHints === 2 && (
-                  <button onClick={unlockNext} style={{ marginTop: 12, padding: "8px 12px", background: "var(--input-bg)", color: "var(--text-main)", border: "1px solid var(--input-border)", borderRadius: 8, fontSize: 11, cursor: "pointer", display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Key size={12} /> Unlock Hint 3
-                  </button>
-                )}
-              </motion.div>
-            )}
-
-            {unlockedHints >= 3 && coachData.hint3 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                style={{ padding: 16, background: "var(--card-bg)", border: `1px solid ${accentGlow}`, borderRadius: 12 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: accent, marginBottom: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <Lightbulb size={12} /> HINT 3: SOLUTION GUIDANCE
-                </div>
-                <div style={{ fontSize: 13, color: "var(--text-main)", lineHeight: 1.6 }}>{coachData.hint3}</div>
-                {unlockedHints === 3 && (
-                  <button onClick={unlockNext} style={{ marginTop: 12, padding: "8px 14px", background: accent, color: "#fff", border: "none", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <CheckCircle2 size={12} /> Reveal Direct Answer
-                  </button>
-                )}
-              </motion.div>
-            )}
+            {[1, 2, 3].map(i => (
+              unlockedHints >= i && coachData[`hint${i}`] && (
+                <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3"
+                >
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: accent }}>
+                    <Lightbulb size={14} /> Hint {i}: {i === 1 ? "Broad Concept" : i === 2 ? "Specific Approach" : "Solution Guidance"}
+                  </div>
+                  <div className="text-sm text-slate-300 leading-relaxed">{coachData[`hint${i}`]}</div>
+                  {unlockedHints === i && (
+                    <button 
+                      onClick={unlockNext} 
+                      className="mt-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 border border-slate-700"
+                    >
+                      <Key size={12} /> {i < 3 ? `Unlock Hint ${i+1}` : "Reveal Direct Answer"}
+                    </button>
+                  )}
+                </motion.div>
+              )
+            ))}
 
             {unlockedHints >= 4 && coachData.answer && (
               <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
-                style={{ padding: 16, background: "rgba(16, 185, 129, 0.05)", border: `1px solid rgba(16, 185, 129, 0.3)`, borderRadius: 12 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "#10b981", marginBottom: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <Sparkles size={12} /> FINAL OPTIMIZED ANSWER
+                className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 space-y-3"
+              >
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+                  <Sparkles size={14} /> Final Optimized Answer
                 </div>
-                <div style={{ fontSize: 13, color: "var(--text-main)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{coachData.answer}</div>
+                <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-wrap">{coachData.answer}</div>
               </motion.div>
             )}
           </AnimatePresence>
         )}
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+      <form onSubmit={handleSubmit} className="flex gap-3 items-end">
         <textarea
           ref={textareaRef}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Describe your problem here... (Shift+Enter for new line)"
+          placeholder="Describe your problem here..."
           disabled={loading}
-          style={{
-            flex: 1, padding: "12px 14px", borderRadius: 10,
-            background: "var(--input-bg)",
-            border: "1px solid var(--input-border)",
-            color: "var(--text-main)", fontSize: 13, lineHeight: 1.5,
-            outline: "none", opacity: loading ? 0.6 : 1, fontFamily: "inherit",
-            resize: "none", minHeight: "44px"
-          }}
+          className="flex-1 p-4 rounded-xl bg-slate-900/30 border border-slate-800 text-white text-sm outline-none focus:ring-2 focus:ring-purple-500/50 transition-all placeholder:text-slate-600 resize-none min-h-[48px]"
         />
-        <button type="submit" disabled={loading} style={{
-          padding: "12px 16px", borderRadius: 10, height: "44px",
-          background: accent, border: "none", flexShrink: 0,
-          color: "#fff", fontSize: 12, cursor: "pointer", fontWeight: 600,
-          opacity: loading || !input.trim() ? 0.6 : 1, display: "flex", alignItems: "center"
-        }}>
-          <Send size={15} />
+        <button 
+          type="submit" 
+          disabled={loading || !input.trim()} 
+          className={`size-12 rounded-xl flex items-center justify-center transition-all ${
+            loading || !input.trim()
+              ? "bg-slate-800 text-slate-600 cursor-not-allowed"
+              : "bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/20 active:scale-[0.98]"
+          }`}
+        >
+          <Send size={20} />
         </button>
       </form>
     </motion.div>

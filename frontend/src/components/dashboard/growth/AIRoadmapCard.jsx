@@ -23,7 +23,6 @@ export function AIRoadmapCard({ t, accent, accentGlow, cardStyle, apiKey }) {
     setError("");
     setLoading(true);
     try {
-      // Points to our new FastAPI Backend
       const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const res = await fetch(`${API_URL}/api/roadmap/generate`, {
         method: "POST",
@@ -47,44 +46,34 @@ export function AIRoadmapCard({ t, accent, accentGlow, cardStyle, apiKey }) {
   };
 
   return (
-    <motion.div className="bento-card md-col-span-7" style={{ ...cardStyle, padding: 24 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-        <Map size={16} color={accent} />
-        <div style={{ fontSize: 11, color: "var(--text-subtle)", letterSpacing: 2, fontWeight: 600 }}>
-          AI ROADMAP GENERATOR
+    <motion.div className="bento-card md-col-span-7 p-8" style={cardStyle}>
+      <div className="flex items-center gap-3 mb-8">
+        <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
+          <Map size={20} />
+        </div>
+        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+          AI Roadmap Generator
         </div>
       </div>
 
       {!roadmap ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <p style={{ fontSize: 13, color: "var(--text-main)", marginBottom: 8 }}>
-            Enter your learning objective to generate a structured AI curriculum.
+        <div className="space-y-6">
+          <p className="text-sm text-slate-400 max-w-md leading-relaxed">
+            Enter your learning objective to generate a structured AI curriculum tailored to your pace and level.
           </p>
           
           <input
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
             placeholder="What do you want to master? (e.g. System Design)"
-            style={{
-              padding: "12px 16px",
-              borderRadius: 8,
-              border: "1px solid var(--input-border)",
-              background: "var(--input-bg)",
-              color: "var(--text-main)",
-              fontSize: 14,
-              outline: "none"
-            }}
+            className="w-full px-5 py-4 rounded-xl border border-slate-800 bg-slate-900/30 text-white text-sm outline-none focus:ring-2 focus:ring-purple-500/50 transition-all placeholder:text-slate-600"
           />
 
-          <div style={{ display: "flex", gap: 12 }}>
+          <div className="flex flex-col sm:flex-row gap-4">
             <select
               value={level}
               onChange={(e) => setLevel(e.target.value)}
-              style={{
-                flex: 1, padding: "10px 14px", borderRadius: 8,
-                border: "1px solid var(--input-border)", background: "var(--input-bg)",
-                color: "var(--text-main)", fontSize: 13, cursor: "pointer"
-              }}
+              className="flex-1 px-4 py-3 rounded-xl border border-slate-800 bg-slate-900/50 text-white text-sm cursor-pointer outline-none focus:border-purple-500/50"
             >
               <option value="Beginner">Beginner</option>
               <option value="Intermediate">Intermediate</option>
@@ -94,11 +83,7 @@ export function AIRoadmapCard({ t, accent, accentGlow, cardStyle, apiKey }) {
             <select
               value={mode}
               onChange={(e) => setMode(e.target.value)}
-              style={{
-                flex: 1, padding: "10px 14px", borderRadius: 8,
-                border: "1px solid var(--input-border)", background: "var(--input-bg)",
-                color: "var(--text-main)", fontSize: 13, cursor: "pointer"
-              }}
+              className="flex-1 px-4 py-3 rounded-xl border border-slate-800 bg-slate-900/50 text-white text-sm cursor-pointer outline-none focus:border-purple-500/50"
             >
               <option value="Relaxed">Relaxed Pace</option>
               <option value="Balanced">Balanced</option>
@@ -106,124 +91,83 @@ export function AIRoadmapCard({ t, accent, accentGlow, cardStyle, apiKey }) {
             </select>
           </div>
 
-          {error && <div style={{ color: "#ef4444", fontSize: 13, marginTop: 4 }}>{error}</div>}
+          {error && <div className="text-rose-500 text-xs font-medium bg-rose-500/10 p-3 rounded-lg border border-rose-500/20">{error}</div>}
 
           <button
             onClick={generateRoadmap}
             disabled={loading}
-            style={{
-              background: accent,
-              color: "#fff",
-              border: "none",
-              padding: "12px",
-              borderRadius: 8,
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: loading ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              marginTop: 8,
-              opacity: loading ? 0.7 : 1
-            }}
+            className={`w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+              loading 
+                ? "bg-slate-800 text-slate-500 cursor-not-allowed" 
+                : "bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/20 active:scale-[0.98]"
+            }`}
           >
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+            {loading ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
             {loading ? "Crafting Strategy..." : "Generate Roadmap"}
           </button>
         </div>
       ) : (
-        <motion.div
-           initial={{ opacity: 0, y: 10 }}
-           animate={{ opacity: 1, y: 0 }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 18, color: "var(--text-main)", fontWeight: 700 }}>
-              {roadmap.title}
-            </h3>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+          <div className="flex justify-between items-start">
+            <h3 className="text-2xl font-bold tracking-tight text-white">{roadmap.title}</h3>
             <button 
               onClick={() => setRoadmap(null)}
-              style={{
-                background: "transparent", border: "none", color: "var(--text-subtle)",
-                cursor: "pointer", fontSize: 12, textDecoration: "underline"
-              }}
+              className="text-[10px] uppercase tracking-widest font-bold text-slate-500 hover:text-purple-400 transition-colors"
             >
               Reset
             </button>
           </div>
-          <p style={{ fontSize: 13, color: "var(--text-subtle)", marginBottom: 24, lineHeight: 1.5 }}>
+          <p className="text-sm text-slate-400 leading-relaxed max-w-3xl">
             {roadmap.summary}
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="space-y-4">
             <AnimatePresence>
               {roadmap.phases.map((phase, i) => (
-                <div key={i} style={{ 
-                    border: `1px solid var(--card-border)`, 
-                    borderRadius: 12, 
-                    overflow: "hidden",
-                    background: expandedPhases[i] ? "var(--bg-card-hover, rgba(0,0,0,0.02))" : "transparent",
-                    transition: "all 0.2s"
-                  }}
-                >
+                <div key={i} className={`rounded-2xl border transition-all duration-300 ${expandedPhases[i] ? "border-purple-500/30 bg-purple-500/5" : "border-slate-800 hover:border-slate-700 bg-slate-900/20"}`}>
                   <div 
                     onClick={() => togglePhase(i)}
-                    style={{
-                      padding: "16px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between",
-                      background: expandedPhases[i] ? `linear-gradient(90deg, ${accentGlow}, transparent)` : "transparent",
-                      borderBottom: expandedPhases[i] ? `1px solid var(--card-border)` : "none"
-                    }}
+                    className="p-5 cursor-pointer flex items-center justify-between"
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <div style={{
-                        width: 28, height: 28, borderRadius: "50%",
-                        background: accent, color: "#fff", display: "flex",
-                        alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: "bold"
-                      }}>
+                    <div className="flex items-center gap-4">
+                      <div className="size-8 rounded-xl bg-purple-600 text-white flex items-center justify-center text-xs font-bold shadow-lg shadow-purple-600/20">
                         {phase.phaseNumber || i + 1}
                       </div>
                       <div>
-                        <div style={{ color: "var(--text-main)", fontSize: 14, fontWeight: 600 }}>
-                          {phase.title}
-                        </div>
-                        <div style={{ color: "var(--text-subtle)", fontSize: 11, marginTop: 2 }}>
-                          {phase.duration}
-                        </div>
+                        <div className="text-sm font-bold text-white leading-tight">{phase.title}</div>
+                        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">{phase.duration}</div>
                       </div>
                     </div>
-                    {expandedPhases[i] ? <ChevronUp size={16} color="var(--text-subtle)" /> : <ChevronDown size={16} color="var(--text-subtle)" />}
+                    <div className="text-slate-600">
+                      {expandedPhases[i] ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    </div>
                   </div>
 
                   {expandedPhases[i] && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      style={{ padding: "0 16px 16px 56px" }}
-                    >
-                      <ul style={{ margin: 0, paddingLeft: 16, color: "var(--text-subtle)", fontSize: 13, lineHeight: 1.6 }}>
-                        {phase.topics?.map((topic, tIdx) => (
-                          <li key={tIdx}>{topic}</li>
-                        ))}
-                      </ul>
-                      
-                      {phase.resources && phase.resources.length > 0 && (
-                        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px dashed var(--card-border)" }}>
-                          <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-main)", textTransform: "uppercase", letterSpacing: 1 }}>
-                            Recommended Resources:
-                          </span>
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
-                            {phase.resources.map((res, rIdx) => (
-                              <span key={rIdx} style={{ 
-                                padding: "4px 8px", background: "var(--input-bg)", 
-                                borderRadius: 4, fontSize: 11, color: "var(--text-subtle)" 
-                              }}>
-                                {res}
-                              </span>
-                            ))}
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="px-5 pb-5">
+                      <div className="ml-12 border-l border-slate-800 pl-6 space-y-3">
+                        <ul className="space-y-2">
+                          {phase.topics?.map((topic, tIdx) => (
+                            <li key={tIdx} className="text-sm text-slate-300 flex items-start gap-2 leading-relaxed">
+                              <span className="mt-2 size-1 rounded-full bg-purple-500 shrink-0" />
+                              {topic}
+                            </li>
+                          ))}
+                        </ul>
+                        
+                        {phase.resources && phase.resources.length > 0 && (
+                          <div className="pt-4 border-t border-slate-800 mt-4">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Resources</span>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {phase.resources.map((res, rIdx) => (
+                                <span key={rIdx} className="px-2 py-1 bg-slate-900 rounded-lg text-[10px] font-bold text-slate-400 border border-slate-800">
+                                  {res}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </div>

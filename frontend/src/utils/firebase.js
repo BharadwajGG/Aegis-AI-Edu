@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -14,6 +15,7 @@ const isConfigured = Boolean(firebaseConfig.apiKey);
 
 const app = isConfigured ? initializeApp(firebaseConfig) : null;
 const auth = isConfigured ? getAuth(app) : null;
+const db = isConfigured ? getFirestore(app) : null;
 const googleProvider = isConfigured ? new GoogleAuthProvider() : null;
 
 // Mock user logic for graceful degradation if keys aren't added yet!
@@ -43,4 +45,4 @@ export const signOutAccount = async () => {
   return firebaseSignOut(auth);
 };
 
-export { auth, isConfigured };
+export { auth, db, isConfigured };

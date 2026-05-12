@@ -1,64 +1,100 @@
-<div align="center">
-  <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield.svg" alt="Aegis Logo" width="80" height="80">
-  <h1 align="center">AEGIS Growth OS</h1>
-  <p align="center">
-    <strong>The Next-Generation AI-Powered Learning Engine</strong>
-  </p>
-  <p align="center">
-    <a href="#"><img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React"></a>
-    <a href="#"><img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"></a>
-    <a href="#"><img src="https://img.shields.io/badge/AI_Engine-Gemini_2.5_Flash-4285F4?style=flat-square&logo=google&logoColor=white" alt="Gemini AI"></a>
-    <a href="#"><img src="https://img.shields.io/badge/Auth-Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black" alt="Firebase"></a>
-  </p>
-</div>
+# Aegis AI - Student Growth OS
+
+Aegis AI is a premium, AI-powered education dashboard designed for students to master complex concepts, generate intelligent roadmaps, and track their performance in real-time.
+
+## 🚀 Getting Started
+
+Follow these instructions to get the project up and running on your local machine.
+
+### Prerequisites
+
+- **Node.js**: [Download and install Node.js](https://nodejs.org/) (Version 18 or higher)
+- **Python**: [Download and install Python](https://www.python.org/) (Version 3.12 or higher)
 
 ---
 
-## 🎯 The Vision
-Modern education platforms are boring. They treat students like data points rather than humans who need motivation, psychology, and gamification to thrive.
+## 🛠️ Installation & Setup
 
-**Aegis Growth OS** is a visually stunning, highly resilient "Cyber-Zen" dashboard. It seamlessly blends *Growth Mode* (nurturing, personalized roadmaps, progressive hinting) and *Competitive Mode* (leaderboards, global rankings, heatmap activity tracking) to adapt to the student's current psychological state.
+### 1. Backend Setup (FastAPI)
 
-## ✨ Core Features
+The backend handles AI roadmap generation and concept coaching using the Gemini API.
 
-🛡️ **Progressive AI Concept Coach**
-We don't wrap ChatGPT. Our backend intercepts the student's question and forces the Google Gemini AI to return structured JSON. The UI renders this sequentially: breaking down Broad Hints, Specific Nudges, and finally the Direct Answer, forcing genuine *Socratic learning* instead of cheating.
+1.  **Navigate to the backend directory:**
+    ```bash
+    cd backend
+    ```
 
-🗺️ **Dynamic AI Curriculum Generative Roadmaps**
-Type your end goal, and Aegis returns a beautifully mapped, step-by-step curriculum dynamically structured to your learning pace (Beginner to Intensive).
+2.  **Create a virtual environment:**
+    ```bash
+    python -m venv venv
+    ```
 
-🔥 **GitHub-Style Consistency Tracker Heatmap**
-Students are held accountable via a brutal visual reality check—a massive 365-day heat map built completely natively via CSS Flexbox charting to track their velocity without heavy external libraries.
+3.  **Activate the virtual environment:**
+    - **Windows:**
+      ```bash
+      .\venv\Scripts\activate
+      ```
+    - **macOS/Linux:**
+      ```bash
+      source venv/bin/activate
+      ```
 
-🎭 **Ghost Mode (Privacy & Focus)**
-Social comparison causes anxiety. With a single click, students can blur their avatars and replace their identity with randomized "Ghost Names" to purely focus on learning.
+4.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## 🏗️ The Architecture
-We maintain extremely high speeds by completely decoupling the architecture:
-- **Frontend:** React + Vite (Lightning fast DOM updates and Framer Motion micro-animations).
-- **Backend:** Python + FastAPI (Native data/AI integration mapping directly to Google's SDK without rate-limiting the client).
+5.  **Configure environment variables:**
+    Create a `.env` file in the `backend` folder and add your Gemini API Key:
+    ```env
+    GEMINI_API_KEY=your_api_key_here
+    ```
 
-## 🚀 Quick Start Guide
+6.  **Run the backend server:**
+    ```bash
+    python -m uvicorn main:app --reload
+    ```
+    The backend will be available at `http://localhost:8000`.
 
-### 1. Run the Backend
-```bash
-cd backend
-python -m venv .venv
-# Activate venv: .venv\Scripts\activate (Windows) OR source .venv/bin/activate (Mac/Linux)
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-*Note: Make sure your `.env` contains your `GEMINI_API_KEY`.*
+---
 
-### 2. Run the Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-*Note: Ensure your `.env` contains your Firebase Config keys.*
+### 2. Frontend Setup (React + Vite)
 
-## 🌍 Live Deployment
-Pushing to the `main` branch automatically triggers our CI/CD pipelines!
-- **Frontend** hosted instantly globally on **Vercel**.
-- **Backend API** runs smoothly on **Render/Railway**.
+The frontend is a high-performance dashboard built with React and Tailwind CSS.
+
+1.  **Navigate to the frontend directory:**
+    ```bash
+    cd frontend
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+3.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+    The frontend will be available at `http://localhost:5173`.
+
+---
+
+## 🌟 Key Features
+
+- **AI Roadmap Generator**: Enter any learning objective to receive a structured, multi-phase curriculum.
+- **Concept Coach**: Paste complex problems to receive progressive Socratic hints instead of immediate spoilers.
+- **Growth & Competitive Modes**: Toggle between a focused learning environment and a competitive leaderboard view.
+- **Consistency Tracker**: Visualized contribution graph to track daily learning streaks.
+- **Live Leaderboard**: Real-time performance tracking with global ranking.
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React, Vite, Tailwind CSS, Framer Motion, Lucide Icons, Recharts.
+- **Backend**: FastAPI, Python, Uvicorn, Google Generative AI (Gemini).
+- **Authentication**: Firebase Auth integration.
+
+---
+
+## © License
+Aegis AI © 2026. All rights reserved.

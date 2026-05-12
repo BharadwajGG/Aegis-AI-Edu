@@ -14,12 +14,12 @@ const data = [
 
 export function ActivityChart({ t, accent, cardStyle }) {
   return (
-    <motion.div className="bento-card md-col-span-3" style={{ ...cardStyle, padding: 24, display: "flex", flexDirection: "column" }}>
-      <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2, marginBottom: 16 }}>
-        {t.focusTime.toUpperCase()} / VELOCITY
+    <motion.div className="bento-card md-col-span-3 p-6 flex flex-col" style={cardStyle}>
+      <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-6 font-semibold">
+        {t.focusTime} / VELOCITY
       </div>
-      <div style={{ flex: 1, minHeight: 120, position: "relative", margin: "0 -10px" }}>
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="flex-1 min-h-[120px] relative -mx-2">
+        <ResponsiveContainer width="100%" height="100%" debounce={50}>
           <AreaChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorFocus" x1="0" y1="0" x2="0" y2="1">
@@ -28,21 +28,18 @@ export function ActivityChart({ t, accent, cardStyle }) {
               </linearGradient>
             </defs>
             <YAxis hide domain={[0, 'dataMax']} />
-            <Area type="monotone" dataKey="focus" stroke={accent} strokeWidth={2} fillOpacity={1} fill="url(#colorFocus)" />
+            <Area type="monotone" dataKey="focus" stroke={accent} strokeWidth={2.5} fillOpacity={1} fill="url(#colorFocus)" />
           </AreaChart>
         </ResponsiveContainer>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 16 }}>
+      <div className="grid grid-cols-2 gap-3 mt-6">
         {[
           { label: t.weeklyGoal, val: "25h" },
           { label: "Daily Avg", val: "3.5h" },
         ].map(({ label, val }) => (
-          <div key={label} style={{
-            padding: "10px 12px", borderRadius: 10,
-            background: "var(--input-bg)", textAlign: "center",
-          }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: accent }}>{val}</div>
-            <div style={{ fontSize: 9, color: "var(--text-subtle)", marginTop: 2 }}>{label}</div>
+          <div key={label} className="p-3 rounded-xl bg-slate-900/50 border border-slate-800 text-center">
+            <div className="text-lg font-bold tracking-tight" style={{ color: accent }}>{val}</div>
+            <div className="text-[10px] text-slate-500 font-medium uppercase mt-1">{label}</div>
           </div>
         ))}
       </div>

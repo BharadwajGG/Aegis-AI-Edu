@@ -6,35 +6,40 @@ import { PulseDot } from "../../ui/PulseDot";
 
 export function DailyStreak({ t, accent, accentCardStyle }) {
   return (
-    <motion.div className="bento-card md-col-span-4" style={{ ...accentCardStyle, padding: 24 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+    <motion.div 
+      className="bento-card md-col-span-4 p-6" 
+      style={accentCardStyle}
+    >
+      <div className="flex justify-between items-start mb-5">
         <div>
-          <div style={{ fontSize: 9, color: "var(--text-subtle)", letterSpacing: 2, marginBottom: 6 }}>
-            {t.dailyStreak.toUpperCase()}
+          <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-semibold">
+            {t.dailyStreak}
           </div>
-          <div style={{ fontSize: 42, fontWeight: 800, color: accent, lineHeight: 1 }}>47</div>
-          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>{t.streakDays}</div>
+          <div className="text-5xl font-bold tracking-tighter" style={{ color: accent }}>47</div>
+          <div className="text-xs text-slate-400 mt-1 font-medium">{t.streakDays}</div>
         </div>
-        <div style={{ position: "relative" }}>
+        <div className="relative">
           <RadialProgress value={78} color={accent} size={72} stroke={5} />
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Flame size={20} color={accent} />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Flame size={20} style={{ color: accent }} />
           </div>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 }}>
+      
+      <div className="grid grid-cols-7 gap-1">
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} style={{
-            height: 28, borderRadius: 4,
-            background: i < 5 ? accent : "var(--input-bg)",
-            opacity: i < 5 ? (1 - i * 0.08) : 1,
-            transition: "background 0.3s",
-          }} />
+          <div key={i} className={`h-8 rounded-lg transition-colors duration-300 ${i < 5 ? "" : "bg-slate-800/50"}`}
+            style={{ 
+              background: i < 5 ? accent : undefined,
+              opacity: i < 5 ? (1 - i * 0.1) : 1
+            }} 
+          />
         ))}
       </div>
-      <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 6 }}>
+      
+      <div className="mt-4 flex items-center gap-2">
         <PulseDot color={accent} />
-        <span style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: 1 }}>
+        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">
           {t.personalBest}: 63 {t.streakDays}
         </span>
       </div>

@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShieldAlert } from 'lucide-react';
-import { useIsMobile } from '../../hooks/useIsMobile';
+import { Shield } from 'lucide-react';
 
 export function AuthLanding({ login }) {
   const [loading, setLoading] = useState(false);
-  const isMobile = useIsMobile();
 
   const handleLogin = async () => {
     setLoading(true);
@@ -17,31 +15,41 @@ export function AuthLanding({ login }) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#050505', color: '#fff' }}>
-      <div style={{
-          position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0,
-          background: "radial-gradient(ellipse 60% 40% at 50% -20%, rgba(16,185,129,0.15) 0%, transparent 70%)"
-        }} />
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} 
-        style={{ padding: isMobile ? 24 : 40, width: "90%", maxWidth: 400, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, textAlign: 'center', zIndex: 1, backdropFilter: 'blur(20px)' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-           <div style={{ padding: 16, background: 'rgba(16,185,129,0.1)', borderRadius: '50%', color: '#10b981' }}>
-             <ShieldAlert size={40} />
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white relative overflow-hidden selection:bg-purple-500/30">
+      {/* Background Gradients */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-purple-600/10 blur-[120px] rounded-full" />
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        className="relative z-10 p-8 md:p-12 w-full max-w-md bg-white/[0.02] border border-white/10 rounded-[32px] text-center backdrop-blur-2xl shadow-2xl"
+      >
+        <div className="flex justify-center mb-8">
+           <div className="p-5 bg-purple-500/10 rounded-[24px] text-purple-500 ring-1 ring-purple-500/20">
+             <Shield size={48} strokeWidth={1.5} />
            </div>
         </div>
-        <h1 style={{ fontSize: 28, marginBottom: 8, letterSpacing: 1, fontWeight: 700 }}>Welcome to Aegis</h1>
-        <p style={{ color: '#a1a1aa', marginBottom: 32, fontSize: 14, lineHeight: 1.5 }}>
-          Please authorize with your Google account. We use this to secure your workspace and send real-time personalized email nudges.
+
+        <h1 className="text-3xl font-bold mb-3 tracking-tight">Welcome to Aegis</h1>
+        
+        <p className="text-slate-400 mb-10 text-sm leading-relaxed">
+          Please authorize with your Google account to secure your workspace and access your personalized growth engine.
         </p>
-        <button onClick={handleLogin} disabled={loading} style={{ 
-            width: '100%', padding: '14px 20px', borderRadius: 12, border: 'none', 
-            background: loading ? '#3f3f46' : '#10b981', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-            transition: 'background 0.3s'
-        }}>
+
+        <button 
+          onClick={handleLogin} 
+          disabled={loading} 
+          className={`w-full py-4 rounded-xl font-bold text-sm transition-all duration-300 ${
+            loading 
+              ? "bg-slate-800 text-slate-500 cursor-not-allowed" 
+              : "bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/20 active:scale-[0.98]"
+          }`}
+        >
           {loading ? "Authenticating..." : "Sign In with Google"}
         </button>
-        <p style={{ color: '#52525b', fontSize: 11, marginTop: 20 }}>
-          If Firebase API keys are absent, this will securely fallback to a mock profile for demonstration.
+
+        <p className="text-slate-600 text-[10px] mt-8 uppercase tracking-widest font-medium">
+          Secure • Personalized • intelligent
         </p>
       </motion.div>
     </div>

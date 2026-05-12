@@ -1,0 +1,120 @@
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, Shield } from "lucide-react";
+import { navLinks } from "../../constants/navLinks";
+
+export function Navbar({ activeView, setActiveView, theme, toggleTheme, user, userRole, logout }) {
+  const [openMobileMenu, setOpenMobileMenu] = useState(false);
+
+  useEffect(() => {
+    if (openMobileMenu) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [openMobileMenu]);
+
+  const handleNavClick = (view) => {
+    setActiveView(view.toLowerCase().replace(" ", ""));
+    setOpenMobileMenu(false);
+  };
+
+  return (
+    <nav className={`fixed z-50 top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-6xl px-6 py-3 rounded-2xl border transition-all duration-500 flex items-center justify-between ${openMobileMenu ? 'bg-gray-950 border-slate-800' : 'backdrop-blur-xl bg-gray-950/40 border-white/5 shadow-2xl shadow-black/50'}`}>
+      <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveView('overview')}>
+        <div className="size-10 rounded-xl bg-purple-600 flex items-center justify-center shadow-lg shadow-purple-600/20 group-hover:scale-110 transition-transform">
+          <Shield className="text-white" size={20} />
+        </div>
+        <span className="text-2xl font-black tracking-tighter text-white">AEGIS</span>
+      </div>
+
+      <div className="hidden md:flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/5">
+        {userRole === 'student' ? (
+          navLinks.map((link) => {
+            const isActive = activeView === link.name.toLowerCase().replace(" ", "");
+            return (
+              <button
+                key={link.name}
+                onClick={() => handleNavClick(link.name)}
+                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                  isActive ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {link.name}
+              </button>
+            );
+          })
+        ) : (
+          <button
+            onClick={() => setActiveView('overview')}
+            className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+              activeView === 'overview' ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            Overview
+          </button>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={toggleTheme}
+          className="size-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-lg hover:bg-white/10 transition-colors"
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+
+        {user ? (
+          <button 
+            onClick={logout}
+            className="hidden md:flex h-10 px-6 bg-white/5 hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-300 hover:text-red-400 transition-all rounded-xl items-center text-xs font-bold uppercase tracking-widest"
+          >
+            Logout
+          </button>
+        ) : (
+          <button className="hidden md:flex h-10 px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-xl items-center text-xs font-bold uppercase tracking-widest shadow-lg shadow-purple-600/20 transition-all">
+            Get Started
+          </button>
+        )}
+
+        <button onClick={() => setOpenMobileMenu(!openMobileMenu)} className="md:hidden size-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white">
+          {openMobileMenu ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {openMobileMenu && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-x-0 top-20 p-6 bg-gray-950 border border-slate-800 rounded-[32px] flex flex-col items-center gap-6 z-40 md:hidden shadow-2xl"
+          >
+            {userRole === 'student' ? (
+              navLinks.map((link) => (
+                <button 
+                  key={link.name} 
+                  onClick={() => handleNavClick(link.name)}
+                  className="text-lg font-bold text-slate-200 hover:text-purple-500 transition uppercase tracking-widest"
+                >
+                  {link.name}
+                </button>
+              ))
+            ) : (
+              <button 
+                onClick={() => handleNavClick('overview')}
+                className="text-lg font-bold text-slate-200 hover:text-purple-500 transition uppercase tracking-widest"
+              >
+                Overview
+              </button>
+            )}
+            {user && (
+              <button onClick={logout} className="text-red-500 font-black uppercase tracking-widest text-sm">Logout</button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+}
