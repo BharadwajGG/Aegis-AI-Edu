@@ -40,7 +40,7 @@ import { IntegrityScore } from "./src/components/dashboard/competitive/Integrity
 import { LiveChallenge } from "./src/components/dashboard/competitive/LiveChallenge";
 import { StatsSidebar } from "./src/components/dashboard/competitive/StatsSidebar";
 
-export default function AegisDashboard() {
+export default function AegisDashboard({ user, userRole, logout }) {
   const [showSplash, setShowSplash] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const [mode, setMode] = useState("growth");
@@ -54,6 +54,7 @@ export default function AegisDashboard() {
   const isMobile = useIsMobile();
   
   const { user, login, loginRedirect, emailLogin, emailSignup, logout, loading, userRole, setRole } = useAuth();
+
 
   const [apiKey, setApiKey] = useState(() => {
     const saved = window.localStorage.getItem("gemini_key");
@@ -101,6 +102,7 @@ export default function AegisDashboard() {
     return <RoleSelection onSelect={setRole} />;
   }
 
+
   return (
     <SmoothScroll>
       <CustomCursor />
@@ -127,6 +129,7 @@ export default function AegisDashboard() {
         </div>
 
         <main className="relative pt-40 pb-20 px-6 md:px-16 lg:px-24 xl:px-32">
+
           
           {!isStudent && activeView === "overview" ? (
              <EmptyDashboard role={userRole} accent={accent} />
@@ -255,6 +258,7 @@ export default function AegisDashboard() {
                   <DrivesDashboard accent={accent} cardStyle={cardStyle} onBack={() => setActiveView('overview')} />
                 </motion.div>
               )}
+
             </AnimatePresence>
           )}
         </main>
