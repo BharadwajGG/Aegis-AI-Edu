@@ -124,3 +124,62 @@ def generate_coach_response(prompt: str, system_prompt: str, api_key: str = None
         error_details = traceback.format_exc()
         print(f"Error calling Gemini for Coach:\n{error_details}")
         return "Failed to connect to AI. Please check the API configuration on the backend."
+
+def generate_study_guide(drive_info: dict, student_profile: dict, api_key: str = None) -> dict:
+    if api_key:
+        genai.configure(api_key=api_key)
+    else:
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+
+    model = genai.GenerativeModel('gemini-2.5-flash')
+
+    prompt = f"""
+    You are an expert AI Career Coach. 
+    Generate a personalized study guide for a student preparing for a placement drive.
+
+    Company: {drive_info.get('company_name')}
+    Role: {drive_info.get('role_offered')}
+    Required Skills: {', '.join(drive_info.get('required_skills', []))}
+    Hiring Process: {', '.join(drive_info.get('hiring_process', []))}
+
+    Student Profile:
+    - Skills: {', '.join(student_profile.get('skills', []))}
+    - GPA: {student_profile.get('gpa')}
+    - Interests: {', '.join(student_profile.get('interests', []))}
+
+    You MUST respond strictly with a valid JSON object matching the exact structure below. 
+    Do NOT wrap the JSON in Markdown code blocks.
+    Do NOT include any extra text.
+
+    {{
+      "title": "Personalized Study Guide for [Company]",
+      "focus_areas": [
+        {{
+          "topic": "Topic Name",
+          "reason": "Why this is important for this student/company",
+          "resources": ["Resource 1", "Resource 2"]
+        }}
+      ],
+      "daily_plan": [
+        {{ "day": 1, "activity": "Specific activity description" }}
+      ],
+      "interview_questions": ["Question 1", "Question 2"],
+      "final_tip": "A motivational closing tip"
+    }}
+    """
+
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config={"response_mime_type": "application/json"}
+        )
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"Error generating study guide: {e}")
+        return {
+            "title": f"Prep Guide for {drive_info.get('company_name')}",
+            "focus_areas": [{"topic": "General DSA", "reason": "Always important", "resources": ["LeetCode"]}],
+            "daily_plan": [{"day": 1, "activity": "Revise basics"}],
+            "interview_questions": ["Tell me about yourself"],
+            "final_tip": "Keep practicing!"
+        }

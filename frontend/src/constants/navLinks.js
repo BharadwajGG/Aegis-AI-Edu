@@ -3,4 +3,5 @@ export const navLinks = [
     { name: "AI Roadmap", href: "#roadmap" },
     { name: "Concept Coach", href: "#coach" },
     { name: "Community", href: "#community" },
+    { name: "Upcoming Drives", href: "#drives" },
 ];

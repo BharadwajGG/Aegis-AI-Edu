@@ -31,6 +31,9 @@ import { GrowthCalendar } from "./src/components/dashboard/calendar/GrowthCalend
 import { CalendarTicker } from "./src/components/dashboard/calendar/CalendarTicker";
 import { useCalendarEngine } from "./src/hooks/useCalendarEngine";
 
+import { DrivesDashboard } from "./src/components/dashboard/DrivesDashboard";
+import { DrivePreparationAssistant } from "./src/components/dashboard/DrivePreparationAssistant";
+
 import { GlobalRank } from "./src/components/dashboard/competitive/GlobalRank";
 import { LiveLeaderboard } from "./src/components/dashboard/competitive/LiveLeaderboard";
 import { IntegrityScore } from "./src/components/dashboard/competitive/IntegrityScore";
@@ -123,7 +126,7 @@ export default function AegisDashboard() {
           <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-emerald-600/10 blur-[100px] rounded-full opacity-30" />
         </div>
 
-        <main className="relative z-10 pt-32 px-6 md:px-16 lg:px-24 xl:px-32">
+        <main className="relative pt-40 pb-20 px-6 md:px-16 lg:px-24 xl:px-32">
           
           {!isStudent && activeView === "overview" ? (
              <EmptyDashboard role={userRole} accent={accent} />
@@ -244,6 +247,12 @@ export default function AegisDashboard() {
               {activeView === "calendar" && (
                 <motion.div key="calendar" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-5xl mx-auto">
                   <GrowthCalendar t={t} accent={accent} accentDim={accentDim} accentGlow={accentGlow} cardStyle={{...cardStyle, minHeight: 600}} events={events} addEvent={addEvent} syncUniversityEvents={syncUniversityEvents} mode={mode} />
+                </motion.div>
+              )}
+
+              {activeView === "upcomingdrives" && (
+                <motion.div key="drives" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-5xl mx-auto">
+                  <DrivesDashboard accent={accent} cardStyle={cardStyle} onBack={() => setActiveView('overview')} />
                 </motion.div>
               )}
             </AnimatePresence>
