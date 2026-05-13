@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Mail, Lock, ChevronRight, ArrowLeft } from 'lucide-react';
 
-export function AuthLanding({ login, loginRedirect, emailLogin, emailSignup }) {
+export function AuthLanding({ login, loginRedirect, emailLogin, emailSignup, defaultRole = 'student' }) {
+
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState('landing'); // landing, login, signup
   const [email, setEmail] = useState('');
@@ -15,12 +16,16 @@ export function AuthLanding({ login, loginRedirect, emailLogin, emailSignup }) {
     setLoading(true);
     setError('');
     try {
+      // NOTE: For Google login, useAuth handleUserResponse will default to student
+      // Ideally we'd pass defaultRole here too, but our useAuth doesn't accept extraData for Google login easily without changing the signature.
+      // For now, if defaultRole is recruiter, it might default to student if they use Google. We'll stick to email for specific roles.
       await login();
     } catch (e) {
       if (e.message === "FIREBASE_NOT_CONFIGURED") {
         setShowConfigError(true);
       } else {
         // Log the full error to help debug
+
         console.error("Auth Error Details:", e);
         setError(`Authentication Error: ${e.code || e.message}`);
       }
@@ -43,6 +48,8 @@ export function AuthLanding({ login, loginRedirect, emailLogin, emailSignup }) {
     setLoading(true);
     setTimeout(() => {
       window.localStorage.setItem("aegis_mock_login", "true");
+      window.localStorage.setItem("aegis_mock_role", defaultRole);
+
       window.location.reload();
     }, 1000);
   };
@@ -55,7 +62,8 @@ export function AuthLanding({ login, loginRedirect, emailLogin, emailSignup }) {
       if (view === 'login') {
         await emailLogin(email, password);
       } else {
-        await emailSignup(email, password);
+        await emailSignup(email, password, { role: defaultRole });
+
       }
     } catch (e) {
       setError(e.message === "FIREBASE_NOT_CONFIGURED" ? "Email auth requires Firebase configuration." : (e.message || 'Authentication failed.'));

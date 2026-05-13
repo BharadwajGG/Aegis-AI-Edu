@@ -9,10 +9,13 @@ export function useAuth() {
     if (isMock) {
       return { 
         uid: "mock-uid-12345", 
-        displayName: "Aryan Desai (Mock)", 
+        displayName: localStorage.getItem("aegis_mock_name") || "Aryan Desai (Mock)", 
         email: "aryan.demo@student.edu", 
         photoURL: "https://ui-avatars.com/api/?name=Aryan+Desai&background=10b981&color=fff",
-        role: localStorage.getItem("aegis_mock_role") || null
+        role: localStorage.getItem("aegis_mock_role") || null,
+        collegeId: localStorage.getItem("aegis_mock_collegeId"),
+        naacGrade: localStorage.getItem("aegis_mock_naac")
+
       };
     }
     return null;
@@ -42,7 +45,8 @@ export function useAuth() {
           if (userDoc.exists()) {
             const data = userDoc.data();
             setUserRole(data.role);
-            setUser({ ...currentUser, role: data.role });
+            setUser({ ...currentUser, ...data });
+
           } else {
             // Check local storage for fallback
             const savedRole = localStorage.getItem("aegis_mock_role");
@@ -79,38 +83,52 @@ export function useAuth() {
     }
   };
 
-  const emailLogin = async (email, password) => {
+  const emailLogin = async (email, password, extraData = {}) => {
     try {
       const { signInEmail } = await import("../utils/firebase");
       const res = await signInEmail(email, password);
-      return handleUserResponse(res.user);
+      return handleUserResponse(res.user, extraData);
+
     } catch (error) {
       console.error(error);
       throw error;
     }
   };
 
-  const emailSignup = async (email, password) => {
+  const emailSignup = async (email, password, extraData = {}) => {
     try {
       const { signUpEmail } = await import("../utils/firebase");
       const res = await signUpEmail(email, password);
-      return handleUserResponse(res.user);
+      return handleUserResponse(res.user, extraData);
+
     } catch (error) {
       console.error(error);
       throw error;
     }
   };
 
-  const handleUserResponse = async (currentUser) => {
+  const handleUserResponse = async (currentUser, extraData = {}) => {
     if (isConfigured && currentUser) {
       try {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
           const data = userDoc.data();
           setUserRole(data.role);
-          setUser({ ...currentUser, role: data.role });
+          setUser({ ...currentUser, ...data });
         } else {
-          setUser(currentUser);
+          // New user, save extraData
+          const roleToSet = extraData.role || "student";
+          await setDoc(userDocRef, {
+            email: currentUser.email,
+            displayName: currentUser.displayName || extraData.name || currentUser.email.split('@')[0],
+            role: roleToSet,
+            createdAt: new Date(),
+            ...extraData
+          });
+          setUserRole(roleToSet);
+          setUser({ ...currentUser, ...extraData, role: roleToSet, displayName: currentUser.displayName || extraData.name || currentUser.email.split('@')[0] });
+
         }
       } catch (error) {
         console.error("Manual Response Sync Error:", error);
@@ -120,9 +138,21 @@ export function useAuth() {
       setUser(currentUser);
       if (!isConfigured) {
         localStorage.setItem("aegis_mock_login", "true");
-        const savedRole = localStorage.getItem("aegis_mock_role");
-        setUserRole(savedRole);
-        setUser(prev => ({ ...prev, role: savedRole }));
+        const roleToSet = extraData.role || localStorage.getItem("aegis_mock_role") || "student";
+        localStorage.setItem("aegis_mock_role", roleToSet);
+        if (extraData.name) localStorage.setItem("aegis_mock_name", extraData.name);
+        if (extraData.collegeId) localStorage.setItem("aegis_mock_collegeId", extraData.collegeId);
+        if (extraData.naacGrade) localStorage.setItem("aegis_mock_naac", extraData.naacGrade);
+
+        setUserRole(roleToSet);
+        setUser(prev => ({ 
+            ...prev, 
+            role: roleToSet,
+            displayName: extraData.name || localStorage.getItem("aegis_mock_name") || prev.displayName,
+            collegeId: extraData.collegeId || localStorage.getItem("aegis_mock_collegeId"),
+            naacGrade: extraData.naacGrade || localStorage.getItem("aegis_mock_naac")
+        }));
+
       }
     }
     return currentUser;
