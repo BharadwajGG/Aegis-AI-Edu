@@ -172,4 +172,15 @@ class DrivesService:
             ]
         }
 
+    def get_label_mate_insight(self, drive_id: str, student_profile: Dict) -> Dict:
+        drive = next((d for d in self.drives if d["id"] == drive_id), None)
+        if not drive:
+            return {"error": "Drive not found"}
+        
+        # In a real app, this would call the AI service. 
+        # For now, we'll return the mock structure that the AI service would produce.
+        # This allows the frontend to be developed even if Gemini is not active.
+        from services.ai_service import generate_label_mate_insight
+        return generate_label_mate_insight(drive, student_profile)
+
 drives_service = DrivesService()

@@ -4,4 +4,5 @@ export const navLinks = [
     { name: "Concept Coach", href: "#coach" },
     { name: "Community", href: "#community" },
     { name: "Upcoming Drives", href: "#drives" },
+    { name: "Label-Mate Insight", href: "#labelmate" },
 ];

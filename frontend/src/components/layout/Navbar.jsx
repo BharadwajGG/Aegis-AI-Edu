@@ -15,29 +15,32 @@ export function Navbar({ activeView, setActiveView, theme, toggleTheme, user, us
   }, [openMobileMenu]);
 
   const handleNavClick = (view) => {
-    setActiveView(view.toLowerCase().replace(" ", ""));
+    // Robust mapping for view names (e.g., "Label-Mate Insight" -> "labelmateinsight")
+    const viewId = view.toLowerCase().replace(/[\s-]/g, "");
+    setActiveView(viewId);
     setOpenMobileMenu(false);
   };
 
   return (
-    <nav className={`fixed z-50 top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-6xl px-6 py-3 rounded-2xl border transition-all duration-500 flex items-center justify-between ${openMobileMenu ? 'bg-gray-950 border-slate-800' : 'backdrop-blur-xl bg-gray-950/40 border-white/5 shadow-2xl shadow-black/50'}`}>
-      <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveView('overview')}>
-        <div className="size-10 rounded-xl bg-purple-600 flex items-center justify-center shadow-lg shadow-purple-600/20 group-hover:scale-110 transition-transform">
-          <Shield className="text-white" size={20} />
+    <nav className={`fixed z-50 top-8 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl px-8 py-4 rounded-[24px] border transition-all duration-500 flex items-center justify-between ${openMobileMenu ? 'bg-gray-950 border-slate-800' : 'backdrop-blur-2xl bg-gray-950/60 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]'}`}>
+      <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setActiveView('overview')}>
+        <div className="size-11 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-600/30 group-hover:scale-105 transition-transform">
+          <Shield className="text-white" size={22} />
         </div>
         <span className="text-2xl font-black tracking-tighter text-white">AEGIS</span>
       </div>
 
-      <div className="hidden md:flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/5">
+      <div className="hidden md:flex items-center gap-3 bg-white/5 p-1.5 rounded-2xl border border-white/5">
         {userRole === 'student' ? (
           navLinks.map((link) => {
-            const isActive = activeView === link.name.toLowerCase().replace(" ", "");
+            const viewId = link.name.toLowerCase().replace(/[\s-]/g, "");
+            const isActive = activeView === viewId;
             return (
               <button
                 key={link.name}
                 onClick={() => handleNavClick(link.name)}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
-                  isActive ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
+                className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 ${
+                  isActive ? "bg-purple-600 text-white shadow-xl shadow-purple-600/30" : "text-slate-400 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {link.name}
