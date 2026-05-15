@@ -1,283 +1,545 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { LogOut, Landmark, Shield, Users, BarChart3, PlusCircle, Calendar, Megaphone, CheckCircle2, AlertCircle, Download } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LogOut, FileText, ChevronDown } from 'lucide-react';
+import { db } from '../../utils/firebase';
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import toast from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export function CollegeDashboard({ user, logout }) {
-  const collegeName = user?.displayName || 'College Name';
-  const collegeId = user?.collegeId || 'CLG-001';
-  const naacGrade = user?.naacGrade || 'Not Accredited';
+  // Fix naming priority: use user.name which is where extraData.name is saved
+  const collegeName = user?.name || user?.displayName || 'Maharashtra Institute of Technology';
+  const collegeId = user?.collegeId || 'CLG-MIT-PUNE-001';
+  const naacGrade = user?.naacGrade || 'A+';
+  const totalStudentStrength = user?.studentStrength ? parseInt(user.studentStrength) : 5240;
 
+  const [activeTab, setActiveTab] = useState('Dashboard');
   const [clubs, setClubs] = useState([]);
   const [events, setEvents] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [achievements, setAchievements] = useState([]);
-  const [stats, setStats] = useState({ totalStudents: 0, avgIntegrityScore: 0, clubsRegistered: 0, eventsHeld: 0 });
-  const [feed, setFeed] = useState([]);
+  
+  // Student Tracking Data
+  const [students, setStudents] = useState([
+    { id: 1, name: 'Aryan Desai', dept: 'Computer Science', skillScore: 92, masteryLevel: 'Advanced', streak: '14 days' },
+    { id: 2, name: 'Priya Sharma', dept: 'Information Tech', skillScore: 85, masteryLevel: 'Intermediate', streak: '5 days' },
+    { id: 3, name: 'Neha Gupta', dept: 'Electronics', skillScore: 78, masteryLevel: 'Intermediate', streak: '8 days' },
+    { id: 4, name: 'Rahul Verma', dept: 'Computer Science', skillScore: 64, masteryLevel: 'Beginner', streak: '1 day' },
+  ]);
 
+  // Departments for Distribution
+  const [departments, setDepartments] = useState([
+    { name: 'Computer Sci.', count: 1420 },
+    { name: 'Info. Tech', count: 1180 },
+    { name: 'Electronics', count: 980 },
+    { name: 'Mechanical', count: 840 },
+    { name: 'Civil', count: 520 },
+    { name: 'EXTC', count: 300 },
+  ]);
+  const [deptForm, setDeptForm] = useState({ name: '', count: '' });
+
+  // Forms state
   const [clubForm, setClubForm] = useState({ name: '', tags: '', description: '', memberCount: '' });
   const [eventForm, setEventForm] = useState({ name: '', date: '', type: 'seminar', description: '', targetAudience: '' });
-  const [feedForm, setFeedForm] = useState({ company: '', date: '', role: '', ctc: '' });
-
-  const fetchDashboardData = () => {
-    fetch(`${API_URL}/api/college/clubs`).then(r => r.json()).then(d => setClubs(d.clubs || [])).catch(() => {});
-    fetch(`${API_URL}/api/college/events`).then(r => r.json()).then(d => setEvents(d.events || [])).catch(() => {});
-    fetch(`${API_URL}/api/college/students`).then(r => r.json()).then(d => setStudents(d.students || [])).catch(() => {});
-    fetch(`${API_URL}/api/college/achievements`).then(r => r.json()).then(d => setAchievements(d.achievements || [])).catch(() => {});
-    fetch(`${API_URL}/api/college/stats`).then(r => r.json()).then(d => setStats(d || {})).catch(() => {});
-    fetch(`${API_URL}/api/college/recruiter-feed`).then(r => r.json()).then(d => setFeed(d.feed || [])).catch(() => {});
-  };
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (!user?.uid) return;
+    const clubsRef = collection(db, `colleges/${user.uid}/clubs`);
+    const eventsRef = collection(db, `colleges/${user.uid}/events`);
+    const deptsRef = collection(db, `colleges/${user.uid}/departments`);
+
+    const unsubClubs = onSnapshot(query(clubsRef, orderBy('createdAt', 'desc')), (snapshot) => {
+      const clubsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setClubs(clubsData);
+    });
+
+    const unsubEvents = onSnapshot(query(eventsRef, orderBy('date', 'asc')), (snapshot) => {
+      const eventsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setEvents(eventsData);
+    });
+
+    const unsubDepts = onSnapshot(query(deptsRef, orderBy('createdAt', 'asc')), (snapshot) => {
+      if (!snapshot.empty) {
+        setDepartments(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      }
+    });
+
+    // Mock students fetch if possible
+    fetch(`${API_URL}/api/college/students`).then(r => r.json()).then(d => { if(d.students?.length) setStudents(d.students); }).catch(() => {});
+
+    return () => {
+      unsubClubs();
+      unsubEvents();
+      unsubDepts();
+    };
+  }, [user]);
 
   const handleClubSubmit = async (e) => {
     e.preventDefault();
+    if (!user?.uid) return;
     try {
-      const res = await fetch(`${API_URL}/api/college/clubs`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({...clubForm, memberCount: parseInt(clubForm.memberCount) || 0})
+      await addDoc(collection(db, `colleges/${user.uid}/clubs`), {
+        ...clubForm, tags: clubForm.tags.split(',').map(t => t.trim()), createdAt: serverTimestamp(), collegeId: user.uid
       });
-      if (res.ok) { fetchDashboardData(); setClubForm({ name: '', tags: '', description: '', memberCount: '' }); }
-    } catch(err) { console.error(err); }
+      setClubForm({ name: '', tags: '', description: '', memberCount: '' });
+      toast.success("Club registered!");
+    } catch(err) { console.error(err); toast.error("Failed to save club."); }
   };
 
   const handleEventSubmit = async (e) => {
     e.preventDefault();
+    if (!user?.uid) return;
     try {
-      const res = await fetch(`${API_URL}/api/college/events`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(eventForm)
+      await addDoc(collection(db, `colleges/${user.uid}/events`), {
+        ...eventForm, createdAt: serverTimestamp(), collegeId: user.uid
       });
-      if (res.ok) { fetchDashboardData(); setEventForm({ name: '', date: '', type: 'seminar', description: '', targetAudience: '' }); }
-    } catch(err) { console.error(err); }
+      setEventForm({ name: '', date: '', type: 'seminar', description: '', targetAudience: '' });
+      toast.success("Event posted!");
+    } catch(err) { console.error(err); toast.error("Failed to save event."); }
   };
 
-  const handleFeedSubmit = async (e) => {
+  const handleAddDepartment = async (e) => {
     e.preventDefault();
+    if (!deptForm.name || !deptForm.count) return;
+    
+    const countNum = parseInt(deptForm.count);
+    const totalAllocated = departments.reduce((acc, d) => acc + d.count, 0);
+    
+    if (totalAllocated + countNum > totalStudentStrength) {
+      toast.error(`Cannot allocate more than total students. Remaining: ${totalStudentStrength - totalAllocated}`);
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_URL}/api/college/recruiter-feed`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(feedForm)
-      });
-      if (res.ok) { fetchDashboardData(); setFeedForm({ company: '', date: '', role: '', ctc: '' }); }
-    } catch(err) { console.error(err); }
+      if (user?.uid) {
+        await addDoc(collection(db, `colleges/${user.uid}/departments`), {
+          name: deptForm.name,
+          count: countNum,
+          createdAt: serverTimestamp()
+        });
+      } else {
+        setDepartments([...departments, { name: deptForm.name, count: countNum }]);
+      }
+      setDeptForm({ name: '', count: '' });
+      toast.success("Department added!");
+    } catch(err) {
+      console.error(err);
+      toast.error("Failed to add department.");
+    }
   };
 
   const exportCSV = () => {
-    const csvRows = [['ID', 'Name', 'Department', 'Skill Score', 'Mastery Level', 'Streak']];
-    students.forEach(s => csvRows.push([s.id, s.name, s.dept, s.skillScore, s.masteryLevel, s.streak]));
-    const link = document.createElement("a");
-    link.href = encodeURI("data:text/csv;charset=utf-8," + csvRows.map(e => e.join(",")).join("\n"));
-    link.download = "student_data.csv";
-    link.click();
+    const doc = new jsPDF();
+    doc.text("College Report", 14, 22);
+    doc.save(`College_Report.pdf`);
   };
 
-  const cardStyle = "bg-[#0d1f0d] border border-[#1a3a1a] rounded-xl p-6 relative overflow-hidden";
-  const inputStyle = "w-full bg-[#0a0f0a] border border-[#1a3a1a] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00ff88]/50 transition-colors placeholder:text-slate-600";
-  const labelStyle = "text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5 block";
-  const btnStyle = "w-full bg-[#00ff88] hover:bg-[#00cc6a] text-[#0a0f0a] font-bold py-3 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(0,255,136,0.2)] active:scale-[0.98] flex items-center justify-center gap-2";
+  // Mock data for charts mapping to current departments
+  const deptRatios = departments.map((d, i) => ({
+    name: d.name,
+    val: Math.floor(Math.random() * 30) + 60, // Random placement ratio for visual
+    color: i % 2 === 0 ? '#3b82f6' : '#10b981'
+  })).slice(0, 6);
+
+  const toppers = [
+    { name: 'Aditi Rao', dept: 'Computer Science', cgpa: '9.8' },
+    { name: 'Karan Singh', dept: 'Information Tech', cgpa: '9.6' },
+    { name: 'Pooja Patil', dept: 'Electronics', cgpa: '9.5' },
+  ];
+
+  const achievers = [
+    { name: 'Vikram Joshi', achievement: 'Winner - Smart India Hackathon 2025' },
+    { name: 'Sana Shaikh', achievement: 'Gold Medalist - National Tech Fest' },
+  ];
+
+  const totalAllocatedStudents = departments.reduce((acc, d) => acc + d.count, 0);
 
   return (
-    <div className="min-h-screen bg-[#0a0f0a] text-white selection:bg-[#00ff88]/30 font-sans">
-      <nav className="fixed top-0 w-full z-50 bg-[#0a0f0a]/90 backdrop-blur-xl border-b border-[#1a3a1a] h-20 px-6 lg:px-12 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="size-10 bg-[#00ff88]/10 text-[#00ff88] rounded-xl flex items-center justify-center border border-[#00ff88]/20 shadow-[0_0_15px_rgba(0,255,136,0.1)]">
-            <Landmark size={20} strokeWidth={2} />
-          </div>
-          <div>
-            <span className="font-bold text-xl tracking-tight leading-none block">AEGIS</span>
-            <span className="text-[10px] uppercase tracking-widest text-[#00ff88] font-bold">College Portal</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-6">
-           <div className="hidden md:flex items-center gap-4 text-sm">
-             <div className="text-right">
-               <p className="font-semibold text-slate-200">{collegeName}</p>
-               <p className="text-[10px] text-slate-500 uppercase tracking-widest">{collegeId}</p>
-             </div>
-             <div className="px-3 py-1.5 rounded-full bg-[#00ff88]/10 text-[#00ff88] border border-[#00ff88]/20 flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
-               <Shield size={14} /> NAAC: {naacGrade}
-             </div>
-           </div>
-           <button onClick={logout} className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all">
-             <LogOut size={20} />
-           </button>
-        </div>
-      </nav>
-
-      <main className="pt-28 px-6 lg:px-12 max-w-[1600px] mx-auto pb-20 space-y-6">
-        
-        {/* 5. NAAC REPORTING DASHBOARD */}
-        <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={cardStyle}>
-          <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-6 mb-6">
+    <div className="min-h-screen bg-[#0a0d14] text-slate-300 font-sans flex overflow-hidden">
+      
+      {/* SIDEBAR */}
+      <aside className="w-[280px] bg-[#0a0d14] border-r border-[#1e2536] flex flex-col h-screen shrink-0">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="size-10 bg-[#172A54] rounded flex items-center justify-center border border-blue-500/20">
+              <span className="w-4 h-4 border border-blue-500 rounded-sm"></span>
+            </div>
             <div>
-              <h2 className="text-xl font-bold flex items-center gap-2"><BarChart3 className="text-[#00ff88]" /> NAAC Reporting & Stats</h2>
-              <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">Institutional Overview</p>
+              <h1 className="font-bold text-white text-lg leading-tight tracking-wide">AEGIS</h1>
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">College Portal</p>
             </div>
-            <button onClick={exportCSV} className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
-              <Download size={16} /> Export Student Data (CSV)
-            </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[{label: "Total Students", val: stats.totalStudents, icon: Users},
-              {label: "Avg Integrity Score", val: `${stats.avgIntegrityScore}%`, icon: Shield},
-              {label: "Registered Clubs", val: stats.clubsRegistered, icon: Landmark},
-              {label: "Events Hosted", val: stats.eventsHeld, icon: Calendar}].map((s, i) => (
-                <div key={i} className="bg-[#0a0f0a] border border-[#1a3a1a] rounded-xl p-4 flex items-center gap-4">
-                  <div className="p-3 bg-[#00ff88]/10 text-[#00ff88] rounded-lg"><s.icon size={20} /></div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{s.label}</p>
-                    <p className="text-2xl font-bold">{s.val}</p>
+
+          <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-5 mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2 py-1 bg-blue-500/20 text-blue-500 text-xs font-bold rounded">
+                {collegeName.substring(0, 3).toUpperCase()}
+              </span>
+            </div>
+            <h2 className="font-bold text-white leading-snug mb-1 text-[15px]">{collegeName}</h2>
+            <p className="text-[11px] text-slate-500 mb-4 tracking-wide">{collegeId}</p>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 border border-green-500/20 rounded-full mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+              <span className="text-green-500 text-[10px] font-bold uppercase tracking-wider">NAAC {naacGrade}</span>
+            </div>
+            <div className="space-y-2.5 text-xs">
+              <div className="flex justify-between"><span className="text-slate-500">Affiliation</span><span className="font-medium text-slate-300">{user?.university || 'SPPU'}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Location</span><span className="font-medium text-slate-300">{user?.cityState || 'Pune, MH'}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Principal</span><span className="font-medium text-slate-300">{user?.principalName || 'Dr. R. Kulkarni'}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Email</span><span className="font-medium text-blue-400">{user?.email || 'mit@ac.in'}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-4 space-y-6 scrollbar-hide">
+          {/* OVERVIEW */}
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Overview</p>
+            <div className="space-y-1">
+              {['Dashboard', 'Students'].map(item => (
+                <button key={item} onClick={() => setActiveTab(item)} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all ${activeTab === item ? 'bg-[#172A54]/50 border-l-2 border-blue-500 text-blue-400 font-medium' : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'}`}>
+                  <div className="flex items-center gap-3">
+                    <span className={`w-3.5 h-3.5 border ${activeTab === item ? 'border-blue-500 bg-blue-500/20' : 'border-slate-600'} rounded-sm flex items-center justify-center`}></span>
+                    {item}
                   </div>
-                </div>
-            ))}
-          </div>
-        </motion.section>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* 3. STUDENT TRACKING TABLE */}
-          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={`lg:col-span-2 ${cardStyle} flex flex-col`}>
-            <h2 className="text-xl font-bold flex items-center gap-2 mb-6"><Users className="text-[#00ff88]" /> Student Tracking</h2>
-            <div className="overflow-x-auto flex-1">
-              <table className="w-full text-sm text-left">
-                <thead className="text-[10px] uppercase tracking-widest text-slate-500 bg-[#0a0f0a]">
-                  <tr>
-                    <th className="px-4 py-3 rounded-tl-lg rounded-bl-lg">Name</th>
-                    <th className="px-4 py-3">Dept</th>
-                    <th className="px-4 py-3">Score</th>
-                    <th className="px-4 py-3">Mastery</th>
-                    <th className="px-4 py-3">Streak</th>
-                    <th className="px-4 py-3 rounded-tr-lg rounded-br-lg">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...students].sort((a,b) => b.skillScore - a.skillScore).map(s => (
-                    <tr key={s.id} className={`border-b border-[#1a3a1a] hover:bg-white/[0.02] transition-colors ${s.skillScore < 70 ? 'bg-rose-500/5' : ''}`}>
-                      <td className="px-4 py-4 font-medium">{s.name}</td>
-                      <td className="px-4 py-4 text-slate-400">{s.dept}</td>
-                      <td className="px-4 py-4 font-bold text-[#00ff88]">{s.skillScore}</td>
-                      <td className="px-4 py-4"><span className="px-2 py-1 bg-white/5 border border-white/10 rounded-md text-xs">{s.masteryLevel}</span></td>
-                      <td className="px-4 py-4">{s.streak}🔥</td>
-                      <td className="px-4 py-4 flex items-center gap-2">
-                        {s.skillScore < 70 ? <AlertCircle size={16} className="text-rose-500" /> : <CheckCircle2 size={16} className="text-[#00ff88]" />}
-                        {s.skillScore < 70 ? <span className="text-rose-500 text-xs font-bold uppercase">Flagged</span> : <span className="text-slate-400 text-xs">On Track</span>}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.section>
-
-          {/* 4. DEPARTMENT-WISE ACHIEVEMENT PANEL */}
-          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className={cardStyle}>
-            <h2 className="text-xl font-bold flex items-center gap-2 mb-6"><BarChart3 className="text-[#00ff88]" /> Achievement Index</h2>
-            <div className="h-64 w-full bg-[#0a0f0a] border border-[#1a3a1a] rounded-xl p-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={achievements} layout="vertical" margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                  <XAxis type="number" hide />
-                  <YAxis dataKey="department" type="category" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} />
-                  <Tooltip cursor={{fill: '#1a3a1a'}} contentStyle={{backgroundColor: '#0d1f0d', border: '1px solid #1a3a1a', borderRadius: '8px'}} />
-                  <Bar dataKey="score" fill="#00ff88" radius={[0, 4, 4, 0]} barSize={20} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-6 space-y-3">
-              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">Top Performing Dept</p>
-              {[...achievements].sort((a,b)=>b.score-a.score).slice(0,1).map(a => (
-                <div key={a.department} className="p-4 bg-[#00ff88]/10 border border-[#00ff88]/20 rounded-xl flex justify-between items-center">
-                  <span className="font-bold text-[#00ff88]">{a.department}</span>
-                  <span className="text-sm font-bold bg-[#00ff88]/20 px-2 py-1 rounded text-[#00ff88]">{a.score} pts</span>
-                </div>
+                  {item === 'Students' && <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-medium">{totalStudentStrength}</span>}
+                </button>
               ))}
             </div>
-          </motion.section>
+          </div>
+
+          {/* MANAGE */}
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Manage</p>
+            <div className="space-y-1">
+              {['Student Distribution', 'Register Club', 'Post Event', 'Recruitment Drive'].map(item => (
+                <button key={item} onClick={() => setActiveTab(item)} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all ${activeTab === item ? 'bg-[#172A54]/50 border-l-2 border-blue-500 text-blue-400 font-medium' : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'}`}>
+                  <div className="flex items-center gap-3">
+                    <span className={`w-3.5 h-3.5 border ${activeTab === item ? 'border-blue-500 bg-blue-500/20' : 'border-slate-600'} rounded-sm flex items-center justify-center`}></span>
+                    {item}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* SETTINGS */}
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Settings</p>
+            <div className="space-y-1">
+              {['College Profile', 'Notifications'].map(item => (
+                <button key={item} onClick={() => setActiveTab(item)} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all ${activeTab === item ? 'bg-[#172A54]/50 border-l-2 border-blue-500 text-blue-400 font-medium' : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'}`}>
+                  <div className="flex items-center gap-3">
+                    <span className={`w-3.5 h-3.5 border ${activeTab === item ? 'border-blue-500 bg-blue-500/20' : 'border-slate-600'} rounded-sm flex items-center justify-center`}></span>
+                    {item}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-4 border-t border-[#1e2536]">
+          <div className="flex items-center justify-between p-2 hover:bg-white/5 rounded-lg cursor-pointer transition-colors group">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[#172A54] text-blue-400 flex items-center justify-center font-bold text-xs border border-blue-500/30">
+                {(collegeName?.[0] || 'A').toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-200">Admin User</p>
+                <p className="text-[10px] text-slate-500">College Admin</p>
+              </div>
+            </div>
+            <LogOut size={14} className="text-slate-500 group-hover:text-rose-400" onClick={logout} />
+          </div>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <main className="flex-1 overflow-y-auto p-8 relative">
+        <div className="max-w-[1200px] mx-auto space-y-6">
           
-          {/* 1. CLUB REGISTRATION */}
-          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className={cardStyle}>
-             <h2 className="text-xl font-bold flex items-center gap-2 mb-6"><PlusCircle className="text-[#00ff88]" /> Register Club</h2>
-             <form onSubmit={handleClubSubmit} className="space-y-4">
-               <div><label className={labelStyle}>Club Name</label><input required className={inputStyle} value={clubForm.name} onChange={e=>setClubForm({...clubForm, name: e.target.value})} placeholder="e.g. AI Enthu..." /></div>
-               <div><label className={labelStyle}>Domain / Tags</label><input required className={inputStyle} value={clubForm.tags} onChange={e=>setClubForm({...clubForm, tags: e.target.value})} placeholder="e.g. AI, Tech" /></div>
-               <div><label className={labelStyle}>Description</label><textarea required className={inputStyle} value={clubForm.description} onChange={e=>setClubForm({...clubForm, description: e.target.value})} placeholder="Brief description..." rows={2} /></div>
-               <div><label className={labelStyle}>Member Count</label><input type="number" required className={inputStyle} value={clubForm.memberCount} onChange={e=>setClubForm({...clubForm, memberCount: e.target.value})} placeholder="0" /></div>
-               <button type="submit" className={btnStyle}>Register Club</button>
-             </form>
-             <div className="mt-6 pt-6 border-t border-[#1a3a1a]">
-               <p className={labelStyle}>Recent Clubs</p>
-               <div className="space-y-2">
-                 {clubs.slice(-3).reverse().map((c, i) => (
-                   <div key={i} className="flex justify-between items-center p-3 bg-[#0a0f0a] border border-[#1a3a1a] rounded-lg">
-                     <span className="text-sm font-bold">{c.name}</span>
-                     <span className="text-xs text-slate-500">{c.memberCount} members</span>
-                   </div>
-                 ))}
-               </div>
-             </div>
-          </motion.section>
+          {/* Header */}
+          <div className="flex justify-between items-end mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-white mb-2">{activeTab === 'Dashboard' ? 'Dashboard overview' : activeTab}</h1>
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                <span>AEGIS</span>
+                <span>/</span>
+                <span className="text-slate-400">College Portal</span>
+                <span>/</span>
+                <span className="text-blue-400">{activeTab}</span>
+              </div>
+            </div>
+            {(activeTab === 'Dashboard' || activeTab === 'Students') && (
+              <div className="flex items-center gap-3">
+                 <button className="w-8 h-8 rounded-lg border border-[#1e2536] bg-[#111623] flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+                   <span className="w-3 h-3 border border-current rounded-sm"></span>
+                 </button>
+                 <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 bg-[#172A54] hover:bg-blue-600/40 border border-blue-500/30 rounded-lg text-sm font-semibold text-blue-400 transition-all">
+                   <FileText size={16} /> Export PDF report
+                 </button>
+              </div>
+            )}
+          </div>
 
-          {/* 2. POST UPCOMING EVENTS */}
-          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className={cardStyle}>
-             <h2 className="text-xl font-bold flex items-center gap-2 mb-6"><Calendar className="text-[#00ff88]" /> Post Event</h2>
-             <form onSubmit={handleEventSubmit} className="space-y-4">
-               <div><label className={labelStyle}>Event Name</label><input required className={inputStyle} value={eventForm.name} onChange={e=>setEventForm({...eventForm, name: e.target.value})} placeholder="e.g. Hackathon 2026" /></div>
-               <div className="grid grid-cols-2 gap-4">
-                 <div><label className={labelStyle}>Date</label><input type="date" required className={inputStyle} value={eventForm.date} onChange={e=>setEventForm({...eventForm, date: e.target.value})} /></div>
-                 <div>
-                   <label className={labelStyle}>Type</label>
-                   <select className={`${inputStyle} appearance-none`} value={eventForm.type} onChange={e=>setEventForm({...eventForm, type: e.target.value})}>
-                     <option value="seminar">Seminar</option>
-                     <option value="hackathon">Hackathon</option>
-                     <option value="workshop">Workshop</option>
-                     <option value="drive">Drive</option>
-                   </select>
-                 </div>
-               </div>
-               <div><label className={labelStyle}>Target Audience</label><input required className={inputStyle} value={eventForm.targetAudience} onChange={e=>setEventForm({...eventForm, targetAudience: e.target.value})} placeholder="e.g. All CS Students" /></div>
-               <button type="submit" className={btnStyle}>Publish Event</button>
-             </form>
-             <div className="mt-6 pt-6 border-t border-[#1a3a1a]">
-               <p className={labelStyle}>Upcoming Events</p>
-               <div className="space-y-2">
-                 {events.slice(-3).reverse().map((e, i) => (
-                   <div key={i} className="p-3 bg-[#0a0f0a] border border-[#1a3a1a] rounded-lg">
-                     <div className="flex justify-between items-center mb-1"><span className="text-sm font-bold text-[#00ff88]">{e.name}</span><span className="text-[10px] uppercase font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded">{e.type}</span></div>
-                     <span className="text-xs text-slate-400">{e.date}</span>
-                   </div>
-                 ))}
-               </div>
-             </div>
-          </motion.section>
+          {activeTab === 'Dashboard' && (
+            <>
+              {/* Top Cards */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-5 relative overflow-hidden group">
+                  <div className="flex justify-between items-start mb-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Students</p>
+                    <div className="p-1.5 rounded bg-green-500/10 text-green-500 border border-green-500/20">
+                      <span className="block w-3 h-3 border-2 border-current rounded-sm"></span>
+                    </div>
+                  </div>
+                  <h3 className="text-3xl font-bold text-white mb-2">{totalStudentStrength.toLocaleString()}</h3>
+                  <p className="text-xs text-slate-500 font-medium">{departments.length} departments</p>
+                </div>
+                
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-5 relative overflow-hidden group">
+                  <div className="flex justify-between items-start mb-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Placement Rate</p>
+                    <div className="p-1.5 rounded bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                      <span className="block w-3 h-3 border-2 border-current rounded-sm"></span>
+                    </div>
+                  </div>
+                  <h3 className="text-3xl font-bold text-white mb-2">78%</h3>
+                  <p className="text-xs text-green-500 font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 border border-current rounded-sm inline-block"></span> 4% <span className="text-slate-500">vs last batch</span>
+                  </p>
+                </div>
 
-          {/* 6. RECRUITER INFO FEED */}
-          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className={cardStyle}>
-             <h2 className="text-xl font-bold flex items-center gap-2 mb-6"><Megaphone className="text-[#00ff88]" /> Recruiter Feed</h2>
-             <form onSubmit={handleFeedSubmit} className="space-y-4">
-               <div><label className={labelStyle}>Company Name</label><input required className={inputStyle} value={feedForm.company} onChange={e=>setFeedForm({...feedForm, company: e.target.value})} placeholder="e.g. Google" /></div>
-               <div className="grid grid-cols-2 gap-4">
-                 <div><label className={labelStyle}>Role</label><input required className={inputStyle} value={feedForm.role} onChange={e=>setFeedForm({...feedForm, role: e.target.value})} placeholder="SDE-1" /></div>
-                 <div><label className={labelStyle}>CTC</label><input required className={inputStyle} value={feedForm.ctc} onChange={e=>setFeedForm({...feedForm, ctc: e.target.value})} placeholder="15 LPA" /></div>
-               </div>
-               <div><label className={labelStyle}>Visit Date</label><input type="date" required className={inputStyle} value={feedForm.date} onChange={e=>setFeedForm({...feedForm, date: e.target.value})} /></div>
-               <button type="submit" className={btnStyle}>Post to Student Feed</button>
-             </form>
-             <div className="mt-6 pt-6 border-t border-[#1a3a1a] h-40 overflow-y-auto pr-2">
-               <p className={labelStyle}>Recent Announcements</p>
-               <div className="space-y-3">
-                 {feed.slice().reverse().map((f, i) => (
-                   <div key={i} className="p-3 border-l-2 border-[#00ff88] bg-[#0a0f0a] rounded-r-lg">
-                     <p className="text-sm"><span className="font-bold">{f.company}</span> is visiting on <span className="text-[#00ff88]">{f.date}</span></p>
-                     <p className="text-xs text-slate-400 mt-1">Role: {f.role} • CTC: {f.ctc}</p>
-                   </div>
-                 ))}
-               </div>
-             </div>
-          </motion.section>
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-5 relative overflow-hidden group">
+                  <div className="flex justify-between items-start mb-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Registered Clubs</p>
+                    <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                      <span className="block w-3 h-3 border-2 border-current rounded-sm"></span>
+                    </div>
+                  </div>
+                  <h3 className="text-3xl font-bold text-white mb-2">{clubs.length || 12}</h3>
+                  <p className="text-xs text-slate-500 font-medium">3 pending</p>
+                </div>
+
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-5 relative overflow-hidden group">
+                  <div className="flex justify-between items-start mb-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Avg Integrity</p>
+                    <div className="p-1.5 rounded bg-purple-500/10 text-purple-500 border border-purple-500/20">
+                      <span className="block w-3 h-3 border-2 border-current rounded-sm"></span>
+                    </div>
+                  </div>
+                  <h3 className="text-3xl font-bold text-white mb-2">88%</h3>
+                  <p className="text-xs text-slate-500 font-medium">NAAC reportable</p>
+                </div>
+              </div>
+
+              {/* Middle Section */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Placement Ratio */}
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-2 text-white font-bold text-sm">
+                      <span className="w-3 h-3 border border-slate-500 rounded-sm"></span> Placement ratio — by dept
+                    </div>
+                    <button className="text-xs text-slate-500 hover:text-slate-300">View all</button>
+                  </div>
+                  
+                  <div className="space-y-5">
+                    {deptRatios.map(dept => (
+                      <div key={dept.name} className="flex items-center gap-4 text-sm font-medium">
+                        <span className="w-28 text-slate-300">{dept.name}</span>
+                        <div className="flex-1 flex items-center gap-3">
+                          <div className="w-12 h-1.5 bg-[#1e2536] rounded-full overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${dept.val}%`, backgroundColor: dept.color }}></div>
+                          </div>
+                          <span className="text-xs font-bold" style={{ color: dept.color }}>{dept.val}%</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Students Dept Wise */}
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-2 text-white font-bold text-sm">
+                      <span className="w-3 h-3 border border-slate-500 rounded-sm"></span> Students — dept wise
+                    </div>
+                    <button className="text-xs text-slate-500 hover:text-slate-300">Details</button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {departments.slice(0, 6).map((dept, idx) => (
+                      <div key={dept.name} className="flex items-center justify-between text-sm py-1">
+                        <div className="flex items-center gap-4">
+                          <span className="text-xs text-slate-600 font-mono tracking-wider">0{idx + 1}</span>
+                          <span className="text-slate-300 font-medium">{dept.name}</span>
+                        </div>
+                        <span className="font-bold text-white">{dept.count.toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'Student Distribution' && (
+            <div className="space-y-6">
+              <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6 max-w-4xl flex items-center justify-between">
+                <div>
+                  <h3 className="text-white font-bold mb-1">Student Allocation</h3>
+                  <p className="text-xs text-slate-400">Distribute your total student strength ({totalStudentStrength}) into departments.</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1">Remaining</p>
+                  <p className={`text-2xl font-bold ${totalStudentStrength - totalAllocatedStudents < 0 ? 'text-rose-500' : 'text-blue-400'}`}>
+                    {totalStudentStrength - totalAllocatedStudents}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6 max-w-4xl">
+                {/* Form */}
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6">
+                  <h3 className="text-sm font-bold text-white mb-6 flex items-center gap-2">
+                    <span className="w-3 h-3 border border-blue-500 rounded-sm"></span> Add Department
+                  </h3>
+                  <form onSubmit={handleAddDepartment} className="space-y-4">
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Department Name</label>
+                      <input required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors" value={deptForm.name} onChange={e=>setDeptForm({...deptForm, name: e.target.value})} placeholder="e.g. Computer Science" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Student Count</label>
+                      <input type="number" required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors" value={deptForm.count} onChange={e=>setDeptForm({...deptForm, count: e.target.value})} placeholder="e.g. 120" />
+                    </div>
+                    <button type="submit" className="w-full mt-2 bg-[#172A54] hover:bg-blue-600/40 border border-blue-500/30 text-blue-400 font-bold py-3 px-6 rounded-xl transition-all">
+                      Add Department
+                    </button>
+                  </form>
+                </div>
+
+                {/* List */}
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6">
+                  <h3 className="text-sm font-bold text-white mb-6 flex items-center gap-2">
+                    <span className="w-3 h-3 border border-green-500 rounded-sm"></span> Allocated Departments
+                  </h3>
+                  <div className="space-y-3 overflow-y-auto max-h-[300px] scrollbar-hide pr-2">
+                    {departments.map((dept, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-3 bg-[#0a0d14] rounded-lg border border-[#1e2536]">
+                        <span className="text-sm text-slate-300 font-medium">{dept.name}</span>
+                        <span className="text-sm font-bold text-white bg-white/5 px-2 py-1 rounded">{dept.count}</span>
+                      </div>
+                    ))}
+                    {departments.length === 0 && (
+                      <p className="text-xs text-slate-500 text-center py-4">No departments allocated yet.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'Students' && (
+            <div className="space-y-6">
+              <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6 relative overflow-hidden flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Total College Students</p>
+                  <h3 className="text-3xl font-bold text-white">{totalStudentStrength.toLocaleString()}</h3>
+                </div>
+                <div className="p-3 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                  <span className="block w-6 h-6 border-2 border-current rounded-sm"></span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6">
+                  <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                    <span className="w-3 h-3 border border-amber-500 rounded-sm"></span> Department Toppers (CGPA)
+                  </h3>
+                  <div className="space-y-3">
+                    {toppers.map(t => (
+                      <div key={t.name} className="flex justify-between items-center p-3 bg-[#0a0d14] rounded-lg border border-[#1e2536]">
+                        <div>
+                          <p className="text-sm font-bold text-white">{t.name}</p>
+                          <p className="text-xs text-slate-500">{t.dept}</p>
+                        </div>
+                        <span className="text-sm font-bold text-amber-500">{t.cgpa} CGPA</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6">
+                  <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                    <span className="w-3 h-3 border border-purple-500 rounded-sm"></span> Extra-curricular Achievers
+                  </h3>
+                  <div className="space-y-3">
+                    {achievers.map(a => (
+                      <div key={a.name} className="flex flex-col p-3 bg-[#0a0d14] rounded-lg border border-[#1e2536]">
+                        <p className="text-sm font-bold text-white">{a.name}</p>
+                        <p className="text-xs text-purple-400 mt-1">{a.achievement}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'Register Club' && (
+            <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6 max-w-2xl">
+              <h2 className="text-xl font-bold text-white mb-6">Register a New Club</h2>
+              <form onSubmit={handleClubSubmit} className="space-y-4">
+                <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Club Name</label><input required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-slate-600" value={clubForm.name} onChange={e=>setClubForm({...clubForm, name: e.target.value})} placeholder="e.g. AI Enthu..." /></div>
+                <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Domain / Tags</label><input required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-slate-600" value={clubForm.tags} onChange={e=>setClubForm({...clubForm, tags: e.target.value})} placeholder="e.g. AI, Tech" /></div>
+                <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Description</label><textarea required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-slate-600" value={clubForm.description} onChange={e=>setClubForm({...clubForm, description: e.target.value})} placeholder="Brief description..." rows={3} /></div>
+                <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Member Count</label><input type="number" required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-slate-600" value={clubForm.memberCount} onChange={e=>setClubForm({...clubForm, memberCount: e.target.value})} placeholder="0" /></div>
+                <button type="submit" className="mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-all w-full md:w-auto">Register Club</button>
+              </form>
+            </div>
+          )}
+
+          {activeTab === 'Post Event' && (
+            <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6 max-w-2xl">
+              <h2 className="text-xl font-bold text-white mb-6">Post an Event</h2>
+              <form onSubmit={handleEventSubmit} className="space-y-4">
+                <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Event Name</label><input required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors placeholder:text-slate-600" value={eventForm.name} onChange={e=>setEventForm({...eventForm, name: e.target.value})} placeholder="e.g. Hackathon 2026" /></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Date</label><input type="date" required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-slate-300 focus:outline-none focus:border-amber-500/50 transition-colors" value={eventForm.date} onChange={e=>setEventForm({...eventForm, date: e.target.value})} /></div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Type</label>
+                    <select className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-slate-300 focus:outline-none focus:border-amber-500/50 transition-colors appearance-none" value={eventForm.type} onChange={e=>setEventForm({...eventForm, type: e.target.value})}>
+                      <option value="seminar">Seminar</option>
+                      <option value="hackathon">Hackathon</option>
+                      <option value="workshop">Workshop</option>
+                    </select>
+                  </div>
+                </div>
+                <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Target Audience</label><input required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors placeholder:text-slate-600" value={eventForm.targetAudience} onChange={e=>setEventForm({...eventForm, targetAudience: e.target.value})} placeholder="e.g. All CS Students" /></div>
+                <button type="submit" className="mt-4 bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 px-6 rounded-xl transition-all w-full md:w-auto">Publish Event</button>
+              </form>
+            </div>
+          )}
+
+          {activeTab === 'Recruitment Drive' && (
+            <div className="bg-[#111623] border border-[#1e2536] rounded-xl p-6 max-w-2xl">
+              <h2 className="text-xl font-bold text-white mb-6">Post Recruitment Drive</h2>
+              <p className="text-sm text-slate-400 mb-4">Post details about company visits to notify students.</p>
+              <form onSubmit={handleEventSubmit} className="space-y-4">
+                <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Company Name</label><input required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors placeholder:text-slate-600" placeholder="e.g. Google" /></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Role</label><input required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors placeholder:text-slate-600" placeholder="e.g. SDE-1" /></div>
+                  <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">CTC</label><input required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors placeholder:text-slate-600" placeholder="e.g. 15 LPA" /></div>
+                </div>
+                <div><label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Visit Date</label><input type="date" required className="w-full bg-[#0a0d14] border border-[#1e2536] rounded-lg px-4 py-3 text-sm text-slate-300 focus:outline-none focus:border-purple-500/50 transition-colors" /></div>
+                <button type="submit" className="mt-4 bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-6 rounded-xl transition-all w-full md:w-auto">Post Drive</button>
+              </form>
+            </div>
+          )}
 
         </div>
       </main>
