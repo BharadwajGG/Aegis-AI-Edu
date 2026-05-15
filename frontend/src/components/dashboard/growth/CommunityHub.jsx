@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, Search, Rocket, ChevronRight, BookOpen, MessageSquare, Activity, ShieldAlert, Award, Star } from "lucide-react";
+import { db } from "../../../utils/firebase";
+import { collectionGroup, query, where, onSnapshot } from "firebase/firestore";
 
 const MOCK_CLUBS = [
   {
@@ -57,14 +59,37 @@ const MOCK_CLUBS = [
 export function CommunityHub({ accent, accentGlow, accentDim, cardStyle, userCollege }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeClubId, setActiveClubId] = useState(null);
+  const [realClubs, setRealClubs] = useState([]);
   
-  const filteredClubs = MOCK_CLUBS.filter(c => 
-    c.college === userCollege && 
+  useEffect(() => {
+    if (!userCollege) return;
+    const q = query(collectionGroup(db, 'clubs'), where('collegeName', '==', userCollege));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedClubs = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name || "Unnamed Club",
+          college: data.collegeName,
+          members: data.memberCount || 0,
+          tags: data.tags || [],
+          description: data.description || "",
+          projects: [], // Fallback until projects are implemented
+          updates: [],  // Fallback until updates are implemented
+          basics: []    // Fallback until basics are implemented
+        };
+      });
+      setRealClubs(fetchedClubs.length > 0 ? fetchedClubs : MOCK_CLUBS.filter(c => c.college === userCollege));
+    });
+    return () => unsubscribe();
+  }, [userCollege]);
+
+  const filteredClubs = realClubs.filter(c => 
     (c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
      c.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())))
   );
 
-  const activeClub = MOCK_CLUBS.find(c => c.id === activeClubId);
+  const activeClub = realClubs.find(c => c.id === activeClubId);
 
   return (
     <div className="bento-card p-8 min-h-[600px] relative" style={cardStyle}>

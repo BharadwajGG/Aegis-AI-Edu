@@ -40,7 +40,7 @@ import { IntegrityScore } from "./src/components/dashboard/competitive/Integrity
 import { LiveChallenge } from "./src/components/dashboard/competitive/LiveChallenge";
 import { StatsSidebar } from "./src/components/dashboard/competitive/StatsSidebar";
 
-export default function AegisDashboard({ user, userRole, logout }) {
+export default function AegisDashboard() {
   const [showSplash, setShowSplash] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const [mode, setMode] = useState("growth");
@@ -70,7 +70,7 @@ export default function AegisDashboard({ user, userRole, logout }) {
   
   const activeUserEmail = user ? user.email : "student@example.edu";
   const activeDisplayName = user ? user.displayName : userName;
-  const { events, addEvent, syncUniversityEvents } = useCalendarEngine(mode, activeUserEmail);
+  const { events, addEvent, syncUniversityEvents } = useCalendarEngine(mode, activeUserEmail, userCollege);
 
   const isGrowth = mode === "growth";
   const accent = isGrowth ? "#10b981" : "#f43f5e";

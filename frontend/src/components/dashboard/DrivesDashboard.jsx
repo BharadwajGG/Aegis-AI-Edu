@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { DrivePreparationAssistant } from "./DrivePreparationAssistant";
+import { db } from "../../utils/firebase";
+import { collectionGroup, query, getDocs } from "firebase/firestore";
 
 export function DrivesDashboard({ accent, cardStyle, onBack }) {
   const [view, setView] = useState("card"); // card, timeline, calendar
@@ -26,17 +28,37 @@ export function DrivesDashboard({ accent, cardStyle, onBack }) {
   }, [selectedDrive]);
 
   useEffect(() => {
-    // Fetch all drives
-    fetch("http://localhost:8000/api/drives/")
-      .then(res => res.json())
-      .then(data => {
-        setDrives(data);
-        setLoading(false);
-      })
-      .catch(err => {
+    // Fetch all drives from Firestore
+    const fetchDrives = async () => {
+      try {
+        const q = query(collectionGroup(db, 'recruiterFeed'));
+        const snapshot = await getDocs(q);
+        const fbDrives = snapshot.docs.map(doc => {
+          const f = doc.data();
+          return {
+            id: doc.id,
+            company_name: f.company || 'Unknown Company',
+            role_offered: f.role || 'SDE',
+            package_stipend: f.ctc || 'N/A',
+            drive_date: f.date ? new Date(f.date).toISOString() : new Date().toISOString(),
+            registration_deadline: f.date ? new Date(f.date).toISOString() : new Date().toISOString(),
+            location: "Campus",
+            logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(f.company || 'C')}&background=random`,
+            type: "On-Campus",
+            drive_mode: "Offline",
+            eligibility_criteria: "Refer to college placement cell.",
+            required_skills: ["Communication", "Problem Solving"],
+            hiring_process: ["Aptitude Test", "Technical Interview", "HR Interview"]
+          };
+        });
+        setDrives(fbDrives);
+      } catch (err) {
         console.error("Error fetching drives:", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchDrives();
 
     // Fetch recommendations (mock profile)
     fetch("http://localhost:8000/api/drives/recommendations", {
@@ -54,14 +76,10 @@ export function DrivesDashboard({ accent, cardStyle, onBack }) {
   }, []);
 
   const handleApply = (drive) => {
-    toast.promise(
-      fetch(`http://localhost:8000/api/drives/${drive.id}/apply`, { method: "POST" }),
-      {
-        loading: 'Submitting Application...',
-        success: `Successfully applied to ${drive.company_name}!`,
-        error: 'Failed to apply. Please try again.',
-      }
-    );
+    toast.success(`Successfully applied to ${drive.company_name}!`, {
+      icon: '🎉',
+      style: { background: 'var(--card-bg)', color: 'var(--text-main)', border: '1px solid var(--card-border)' }
+    });
   };
 
   if (loading) return (

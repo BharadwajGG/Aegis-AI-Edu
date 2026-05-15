@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { db } from '../utils/firebase';
+import { collectionGroup, query, where, onSnapshot } from 'firebase/firestore';
 
-export function useCalendarEngine(mode, userEmail = "student@example.com") {
-  const [events, setEvents] = useState(() => {
+export function useCalendarEngine(mode, userEmail = "student@example.com", userCollege = null) {
+  const [localEvents, setLocalEvents] = useState(() => {
     try {
       const saved = localStorage.getItem("aegis_calendar_events");
       if (saved) {
@@ -16,14 +18,36 @@ export function useCalendarEngine(mode, userEmail = "student@example.com") {
       { id: "e2", title: "Hackathon Intro", type: "opportunity", date: new Date(Date.now() + 86400000).toISOString(), notifyEmail: true }
     ];
   });
+  const [firebaseEvents, setFirebaseEvents] = useState([]);
 
   useEffect(() => {
-    localStorage.setItem("aegis_calendar_events", JSON.stringify(events));
-  }, [events]);
+    localStorage.setItem("aegis_calendar_events", JSON.stringify(localEvents));
+  }, [localEvents]);
+
+  useEffect(() => {
+    if (!userCollege) return;
+    const q = query(collectionGroup(db, 'events'), where('collegeName', '==', userCollege));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fbEvents = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.name,
+          type: data.type === 'hackathon' || data.type === 'drive' ? 'opportunity' : 'study',
+          date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
+          notifyEmail: true
+        };
+      });
+      setFirebaseEvents(fbEvents);
+    });
+    return () => unsubscribe();
+  }, [userCollege]);
+
+  const events = [...localEvents, ...firebaseEvents];
 
   const addEvent = (eventData) => {
     const newId = Math.random().toString(36).substr(2, 9);
-    setEvents(prev => [...prev, { ...eventData, id: newId }]);
+    setLocalEvents(prev => [...prev, { ...eventData, id: newId }]);
     
     // Explicit confirmation toast for the user so they see the system working instantly
     if (eventData.notifyEmail) {
@@ -42,7 +66,7 @@ export function useCalendarEngine(mode, userEmail = "student@example.com") {
       { id: "sppu1", title: "Sem 5: DBMS Exam", type: "exam", date: d1.toISOString(), notifyEmail: true },
       { id: "sppu2", title: "Sem 5: CN Exam", type: "exam", date: d2.toISOString(), notifyEmail: true }
     ];
-    setEvents(prev => {
+    setLocalEvents(prev => {
        const filtered = prev.filter(e => !e.id.startsWith("sppu"));
        return [...filtered, ...sppuMock];
     });
