@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, Filter, LayoutGrid, List, Calendar as CalendarIcon, 
   ChevronRight, ArrowLeft, Briefcase, Bookmark, Bell,
-  CheckCircle, XCircle, Info, Star, Zap, ChevronLeft
+  CheckCircle, XCircle, Info, Star, Zap, ChevronLeft, Brain
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { DrivePreparationAssistant } from "./DrivePreparationAssistant";
 
-export function DrivesDashboard({ accent, cardStyle, onBack }) {
+export function DrivesDashboard({ accent, cardStyle, onBack, onViewInsight }) {
   const [view, setView] = useState("card"); // card, timeline, calendar
   const [drives, setDrives] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -283,6 +283,12 @@ export function DrivesDashboard({ accent, cardStyle, onBack }) {
                         Prepare Now
                       </button>
                     </div>
+                    <button 
+                      onClick={() => onViewInsight(selectedDrive.id)}
+                      className="w-full mt-4 h-14 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 transition-all rounded-xl font-bold text-white shadow-xl shadow-purple-500/20 flex items-center justify-center gap-2"
+                    >
+                      <Brain size={18} /> View Label-Mate Insight
+                    </button>
                   </motion.div>
                 ) : (
                   <motion.div

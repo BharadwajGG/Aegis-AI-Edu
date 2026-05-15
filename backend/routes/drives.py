@@ -40,6 +40,14 @@ def get_personalized_guide(drive_id: str, student_profile: Dict = Body(...), x_a
     
     return generate_study_guide(drive, student_profile, api_key=x_api_key)
 
+@router.post("/{drive_id}/insight")
+def get_label_mate_insight(drive_id: str, student_profile: Dict = Body(...)):
+    """Fetch AI-powered hiring readiness insights."""
+    result = drives_service.get_label_mate_insight(drive_id, student_profile)
+    if "error" in result:
+        raise HTTPException(status_code=404, detail=result["error"])
+    return result
+
 @router.post("/{drive_id}/apply")
 def apply_drive(drive_id: str):
     """Apply for a drive."""

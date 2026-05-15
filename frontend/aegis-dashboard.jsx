@@ -33,6 +33,7 @@ import { useCalendarEngine } from "./src/hooks/useCalendarEngine";
 
 import { DrivesDashboard } from "./src/components/dashboard/DrivesDashboard";
 import { DrivePreparationAssistant } from "./src/components/dashboard/DrivePreparationAssistant";
+import { LabelMateInsight } from "./src/components/dashboard/LabelMateInsight";
 
 import { GlobalRank } from "./src/components/dashboard/competitive/GlobalRank";
 import { LiveLeaderboard } from "./src/components/dashboard/competitive/LiveLeaderboard";
@@ -47,13 +48,14 @@ export default function AegisDashboard({ user, userRole, logout }) {
   const [isGhost, setIsGhost] = useState(false);
   const [lang, setLang] = useState("en");
   const [activeView, setActiveView] = useState("overview");
+  const [selectedDriveId, setSelectedDriveId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [userName, setUserName] = useState("Aryan Desai");
   const [userCollege, setUserCollege] = useState("Maharashtra Institute of Technology (MIT)");
   const isMobile = useIsMobile();
   
-  const { user, login, loginRedirect, emailLogin, emailSignup, logout, loading, userRole, setRole } = useAuth();
+  const { login, loginRedirect, emailLogin, emailSignup, loading, setRole } = useAuth();
 
 
   const [apiKey, setApiKey] = useState(() => {
@@ -128,7 +130,7 @@ export default function AegisDashboard({ user, userRole, logout }) {
           <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-emerald-600/10 blur-[100px] rounded-full opacity-30" />
         </div>
 
-        <main className="relative pt-40 pb-20 px-6 md:px-16 lg:px-24 xl:px-32">
+        <main className="relative pt-48 pb-24 px-6 md:px-16 lg:px-24 xl:px-32">
 
           
           {!isStudent && activeView === "overview" ? (
@@ -255,7 +257,21 @@ export default function AegisDashboard({ user, userRole, logout }) {
 
               {activeView === "upcomingdrives" && (
                 <motion.div key="drives" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-5xl mx-auto">
-                  <DrivesDashboard accent={accent} cardStyle={cardStyle} onBack={() => setActiveView('overview')} />
+                  <DrivesDashboard 
+                    accent={accent} 
+                    cardStyle={cardStyle} 
+                    onBack={() => setActiveView('overview')} 
+                    onViewInsight={(id) => {
+                      setSelectedDriveId(id);
+                      setActiveView('labelmateinsight');
+                    }}
+                  />
+                </motion.div>
+              )}
+
+              {activeView === "labelmateinsight" && (
+                <motion.div key="labelmate" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-6xl mx-auto">
+                  <LabelMateInsight accent={accent} cardStyle={cardStyle} driveId={selectedDriveId} />
                 </motion.div>
               )}
 
