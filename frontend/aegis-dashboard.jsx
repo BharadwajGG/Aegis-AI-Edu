@@ -3,12 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
 import { VideoIcon, Shield, ChevronRight } from "lucide-react";
 
-// ─────────────────────────────────────────────────────────────────────
-// DEV_MODE — skip recruiter verification gate for faster dev iteration
-// SET TO false BEFORE PRODUCTION DEPLOY
-// ─────────────────────────────────────────────────────────────────────
-const DEV_MODE = true;
-
 import { useTheme } from "./src/hooks/useTheme";
 import { LANG } from "./src/constants/translations";
 import { GHOST_NAMES } from "./src/constants/ghostNames";
@@ -23,9 +17,7 @@ import { CustomCursor } from "./src/components/ui/CustomCursor";
 import { SettingsModal } from "./src/components/layout/SettingsModal";
 import { AuthLanding } from "./src/components/layout/AuthLanding";
 import { RoleSelection } from "./src/components/layout/RoleSelection";
-import { RecruiterVerification } from "./src/components/layout/RecruiterVerification";
 import { EmptyDashboard } from "./src/components/layout/EmptyDashboard";
-import { RecruiterDashboard } from "./src/components/layout/RecruiterDashboard";
 import { ProfileModal } from "./src/components/layout/ProfileModal";
 
 import { DailyStreak } from "./src/components/dashboard/growth/DailyStreak";
@@ -39,31 +31,41 @@ import { GrowthCalendar } from "./src/components/dashboard/calendar/GrowthCalend
 import { CalendarTicker } from "./src/components/dashboard/calendar/CalendarTicker";
 import { useCalendarEngine } from "./src/hooks/useCalendarEngine";
 
+import { DrivesDashboard } from "./src/components/dashboard/DrivesDashboard";
+import { DrivePreparationAssistant } from "./src/components/dashboard/DrivePreparationAssistant";
+import { LabelMateInsight } from "./src/components/dashboard/LabelMateInsight";
+
 import { GlobalRank } from "./src/components/dashboard/competitive/GlobalRank";
 import { LiveLeaderboard } from "./src/components/dashboard/competitive/LiveLeaderboard";
 import { IntegrityScore } from "./src/components/dashboard/competitive/IntegrityScore";
 import { LiveChallenge } from "./src/components/dashboard/competitive/LiveChallenge";
 import { StatsSidebar } from "./src/components/dashboard/competitive/StatsSidebar";
 
-export default function AegisDashboard() {
+import { ResumeUploader } from "./src/components/dashboard/profile/ResumeUploader";
+import { AIProfileDashboard } from "./src/components/dashboard/profile/AIProfileDashboard";
+
+export default function AegisDashboard({ user, userRole, logout }) {
   const [showSplash, setShowSplash] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const [mode, setMode] = useState("growth");
   const [isGhost, setIsGhost] = useState(false);
   const [lang, setLang] = useState("en");
   const [activeView, setActiveView] = useState("overview");
+  const [selectedDriveId, setSelectedDriveId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [userName, setUserName] = useState("Aryan Desai");
   const [userCollege, setUserCollege] = useState("Maharashtra Institute of Technology (MIT)");
   const isMobile = useIsMobile();
   
-  const { user, login, loginRedirect, emailLogin, emailSignup, logout, loading, userRole, setRole } = useAuth();
+  const { login, loginRedirect, emailLogin, emailSignup, loading, setRole } = useAuth();
+
 
   const [apiKey, setApiKey] = useState(() => {
     const saved = window.localStorage.getItem("gemini_key");
-    if (saved === "AIzaSyAi39J90J6TLajkiXzEFBEq673DzZKiM1w") return "";
-    return saved || "";
+    const envKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (saved && saved !== "AIzaSyAi39J90J6TLajkiXzEFBEq673DzZKiM1w") return saved;
+    return envKey || "";
   });
   
   useEffect(() => window.localStorage.setItem("gemini_key", apiKey), [apiKey]);
@@ -74,7 +76,7 @@ export default function AegisDashboard() {
   
   const activeUserEmail = user ? user.email : "student@example.edu";
   const activeDisplayName = user ? user.displayName : userName;
-  const { events, addEvent, syncUniversityEvents } = useCalendarEngine(mode, activeUserEmail);
+  const { events, addEvent, syncUniversityEvents } = useCalendarEngine(mode, activeUserEmail, userCollege);
 
   const isGrowth = mode === "growth";
   const accent = isGrowth ? "#10b981" : "#f43f5e";
@@ -98,7 +100,6 @@ export default function AegisDashboard() {
 
   const isStudent = userRole === "student";
 
-
   if (loading) return <SplashScreen onComplete={() => setShowSplash(false)} />;
   if (!user) return <AuthLanding login={login} loginRedirect={loginRedirect} emailLogin={emailLogin} emailSignup={emailSignup} />;
   
@@ -107,14 +108,6 @@ export default function AegisDashboard() {
     return <RoleSelection onSelect={setRole} />;
   }
 
-  // Recruiter: show full dashboard (verification handled separately in production)
-  if (userRole === "recruiter") {
-    const recruiterStatus = localStorage.getItem("aegis_recruiter_status");
-    if (!DEV_MODE && recruiterStatus !== "approved") {
-      return <RecruiterVerification />;
-    }
-    return <RecruiterDashboard user={user} logout={logout} />;
-  }
 
   return (
     <SmoothScroll>
@@ -141,7 +134,8 @@ export default function AegisDashboard() {
           <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-emerald-600/10 blur-[100px] rounded-full opacity-30" />
         </div>
 
-        <main className="relative z-10 pt-32 px-6 md:px-16 lg:px-24 xl:px-32">
+        <main className="relative pt-48 pb-24 px-6 md:px-16 lg:px-24 xl:px-32">
+
           
           {!isStudent && activeView === "overview" ? (
              <EmptyDashboard role={userRole} accent={accent} />
@@ -217,6 +211,10 @@ export default function AegisDashboard() {
                       </div>
                     </div>
 
+                    <div className="mb-6">
+                      <ResumeUploader apiKey={apiKey} t={t} accent={accent} accentDim={accentDim} cardStyle={accentCardStyle} setActiveView={setActiveView} />
+                    </div>
+
                     <div className="bento-grid">
                       {isGrowth ? (
                         <>
@@ -264,6 +262,39 @@ export default function AegisDashboard() {
                   <GrowthCalendar t={t} accent={accent} accentDim={accentDim} accentGlow={accentGlow} cardStyle={{...cardStyle, minHeight: 600}} events={events} addEvent={addEvent} syncUniversityEvents={syncUniversityEvents} mode={mode} />
                 </motion.div>
               )}
+
+              {activeView === "upcomingdrives" && (
+                <motion.div key="drives" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-5xl mx-auto">
+                  <DrivesDashboard 
+                    accent={accent} 
+                    cardStyle={cardStyle} 
+                    onBack={() => setActiveView('overview')} 
+                    onViewInsight={(id) => {
+                      setSelectedDriveId(id);
+                      setActiveView('labelmateinsight');
+                    }}
+                  />
+                </motion.div>
+              )}
+
+              {activeView === "labelmateinsight" && (
+                <motion.div key="labelmate" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-6xl mx-auto">
+                  <LabelMateInsight accent={accent} cardStyle={cardStyle} driveId={selectedDriveId} />
+                </motion.div>
+              )}
+
+              {activeView === "aiprofile" && (
+                <motion.div key="aiprofile" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-6xl mx-auto">
+                  <div className="flex items-center gap-4 mb-6">
+                     <button onClick={() => setActiveView('overview')} className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm font-medium transition-colors">
+                        ← Back to Dashboard
+                     </button>
+                     <h2 className="text-2xl font-bold tracking-tight text-white">Dynamic AI Profile</h2>
+                  </div>
+                  <AIProfileDashboard accent={accent} cardStyle={cardStyle} />
+                </motion.div>
+              )}
+
             </AnimatePresence>
           )}
         </main>
