@@ -86,9 +86,13 @@ Your objective is to deeply analyze the following resume. You possess the abilit
 CRITICAL INTELLIGENCE INSTRUCTIONS:
 1. HOLISTIC UNDERSTANDING: Read between the lines. Understand what the student is passionate about, what they excel at, and where they are falling behind industry standards.
 2. MEANINGFUL FEEDBACK: The `insights` section is crucial. Provide deep, actual feedback. Do not use generic terms. Give them actionable, profound insights about their strengths and the stark reality of their weaknesses. 
-3. ACCURATE DATA: While being intelligent, ensure the factual data (CGPA, Projects, University) is highly accurate to the text.
-4. INTELLIGENT SCORING: Calculate `placementReadinessScore` (1-100) based on real-world industry competitiveness, project complexity, and skill depth. Calculate skill `strength` intuitively.
-5. JSON OUTPUT: You must output ONLY valid JSON matching this exact structure. No conversational filler.
+3. ANTI-CHEATING & KEYWORD STUFFING DETECTION: Actively hunt for resume padding. If a student lists advanced technologies (e.g. Kubernetes, Machine Learning, React) but their project descriptions are vague, brief, or lack concrete, measurable impact, ASSUME THEY ARE KEYWORD STUFFING. In such cases:
+   - Severely penalize their `placementReadinessScore` (cap below 40).
+   - Cap the unverified skill's `strength` strictly below 30.
+   - Explicitly call out the lack of depth in their `insights.weaknesses` (e.g., "High volume of technical buzzwords detected without substantial proof of work").
+4. ACCURATE DATA: While being intelligent, ensure the factual data (CGPA, Projects, University) is highly accurate to the text.
+5. INTELLIGENT SCORING: Calculate `placementReadinessScore` (1-100) based on real-world industry competitiveness, project complexity, and skill depth (penalizing keyword padding). Calculate skill `strength` intuitively.
+6. JSON OUTPUT: You must output ONLY valid JSON matching this exact structure. No conversational filler.
 
 Structure requirements:
 {{
