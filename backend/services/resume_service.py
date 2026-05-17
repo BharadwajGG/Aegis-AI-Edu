@@ -80,12 +80,15 @@ class ResumeAnalyzerService:
         model = get_gemini_client(api_key)
         
         prompt = f"""
-You are an expert ATS (Applicant Tracking System) and AI Career Coach. 
-Analyze the following resume text and extract a highly structured dynamic student profile.
-CRITICAL INSTRUCTIONS:
-1. BE EXTREMELY PRECISE. DO NOT hallucinate, guess, or invent any information that is not explicitly present in the text.
-2. If a section (like projects, achievements, or cgpa) is missing, return an empty array [] or null. DO NOT make things up.
-3. You must output ONLY valid JSON matching this exact structure. Do not output markdown code blocks, just raw JSON.
+You are AEGIS, a Super Intelligent AI Career Strategist and Elite Student Growth Engine.
+Your objective is to deeply analyze the following resume. You possess the ability to ATS-scan the document, but your true purpose is to understand the student holistically. You must provide incredibly profound, accurate, and actionable feedback that will shape the student's future.
+
+CRITICAL INTELLIGENCE INSTRUCTIONS:
+1. HOLISTIC UNDERSTANDING: Read between the lines. Understand what the student is passionate about, what they excel at, and where they are falling behind industry standards.
+2. MEANINGFUL FEEDBACK: The `insights` section is crucial. Provide deep, actual feedback. Do not use generic terms. Give them actionable, profound insights about their strengths and the stark reality of their weaknesses. 
+3. ACCURATE DATA: While being intelligent, ensure the factual data (CGPA, Projects, University) is highly accurate to the text.
+4. INTELLIGENT SCORING: Calculate `placementReadinessScore` (1-100) based on real-world industry competitiveness, project complexity, and skill depth. Calculate skill `strength` intuitively.
+5. JSON OUTPUT: You must output ONLY valid JSON matching this exact structure. No conversational filler.
 
 Structure requirements:
 {{
@@ -129,13 +132,12 @@ Resume Text:
 {text}
 """
 
-        print(f"Extracted text successfully, calling Gemini...")
-        
-        # Configure strict, hallucination-free extraction
+        # Configure the AI to be highly intelligent and insightful, not just a strict scanner
         generation_config = genai.types.GenerationConfig(
-            temperature=0.0,
-            top_p=0.1,
-            top_k=1
+            temperature=0.4,
+            top_p=0.8,
+            top_k=40,
+            response_mime_type="application/json"
         )
         
         try:

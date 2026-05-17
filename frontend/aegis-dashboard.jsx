@@ -63,8 +63,9 @@ export default function AegisDashboard({ user, userRole, logout }) {
 
   const [apiKey, setApiKey] = useState(() => {
     const saved = window.localStorage.getItem("gemini_key");
-    if (saved === "AIzaSyAi39J90J6TLajkiXzEFBEq673DzZKiM1w") return "";
-    return saved || "";
+    const envKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (saved && saved !== "AIzaSyAi39J90J6TLajkiXzEFBEq673DzZKiM1w") return saved;
+    return envKey || "";
   });
   
   useEffect(() => window.localStorage.setItem("gemini_key", apiKey), [apiKey]);
