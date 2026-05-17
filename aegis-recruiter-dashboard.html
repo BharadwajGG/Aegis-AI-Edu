@@ -1,0 +1,4304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Aegis — Recruiter Dashboard</title>
+  <meta name="description" content="Aegis Recruiter Dashboard — Campus placement OS for HR professionals." />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700&display=swap" rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13111f;
+      --surface-2: #1a1828;
+      --border: rgba(139, 109, 255, 0.14);
+      --divider: rgba(255, 255, 255, 0.06);
+      --primary: #7c4dff;
+      --primary-soft: rgba(124, 77, 255, 0.12);
+      --primary-glow: rgba(124, 77, 255, 0.3);
+      --text: #e8e6f0;
+      --text-muted: #8e8ba0;
+      --text-faint: #4e4b60;
+      --success: #2dd4a1;
+      --warning: #ffb347;
+      --error: #ff5f7a;
+      --info: #4da6ff;
+      --t: all 200ms cubic-bezier(0.16, 1, 0.3, 1)
+    }
+
+    html {
+      height: 100%
+    }
+
+    body {
+      font-family: 'Satoshi', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer
+    }
+
+    input {
+      font-family: inherit
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--divider);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      z-index: 199;
+      gap: 16px;
+    }
+
+    .tb-left {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .tb-brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tb-brand-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--primary-soft);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tb-brand-name {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      color: var(--text);
+    }
+
+    .tb-brand-rec {
+      font-size: 10px;
+      color: var(--primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      padding: 2px 6px;
+      background: rgba(124, 77, 255, 0.1);
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+
+    .tb-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tb-nav-item {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--t);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tb-nav-item:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tb-nav-item.active {
+      color: #fff;
+      background: var(--primary-soft);
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .tb-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--divider);
+    }
+
+    .main {
+      margin-left: 0;
+      padding-top: 72px;
+      min-height: 100vh;
+      background: var(--bg);
+      position: relative;
+      z-index: 10;
+    }
+
+    /* HERO SECTION */
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 1/2;
+      width: 100%;
+      max-width: 1152px;
+      height: 600px;
+      background: rgba(124, 77, 255, 0.2);
+      filter: blur(120px);
+      border-radius: 50%;
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 0;
+      transform: translateX(-50%);
+      left: 50%;
+    }
+
+    .hero-bg-2 {
+      position: absolute;
+      top: 200px;
+      right: 0;
+      width: 500px;
+      height: 500px;
+      background: rgba(45, 212, 161, 0.1);
+      filter: blur(100px);
+      border-radius: 50%;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 80px auto;
+      padding-top: 60px;
+    }
+
+    .hero-trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 16px;
+      margin-bottom: 32px;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero-avatars {
+      display: flex;
+      margin-right: -4px;
+    }
+
+    .hero-av {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 2px solid var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: -8px;
+    }
+
+    .hero-av:first-child {
+      margin-left: 0;
+    }
+
+    .hero-trust-text {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .hero-title span {
+      background: linear-gradient(to right, #a78bfa, #2dd4a1);
+      -webkit-background-clip: text;
+      color: transparent;
+      font-style: italic;
+    }
+
+    .hero-desc {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero-btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0 32px;
+      height: 48px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--t);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-btn-primary:hover {
+      background: #6b3de8;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(124, 77, 255, 0.25);
+    }
+
+    .hero-btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 32px;
+      height: 48px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--t);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--divider);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+
+    .dh-left h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dh-left h2 span {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+
+    .dh-left p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .zone {
+      display: none;
+      padding: 28px;
+      animation: fadein .2s ease
+    }
+
+    .zone.active {
+      display: block
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .ph-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      text-align: center;
+      gap: 16px
+    }
+
+    .ph-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-faint)
+    }
+
+    .ph-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .ph-sub {
+      font-size: 13px;
+      color: var(--text-muted)
+    }
+
+    .ph-badge {
+      font-size: 11px;
+      color: var(--text-faint);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: var(--t)
+    }
+
+    #toast-wrap {
+      position: fixed;
+      top: 76px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none
+    }
+
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      min-width: 280px;
+      max-width: 380px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+      pointer-events: all;
+      animation: toast-in .25s cubic-bezier(.16, 1, .3, 1);
+      border-left: 3px solid var(--success)
+    }
+
+    .toast.warning {
+      border-left-color: var(--warning)
+    }
+
+    .toast.error {
+      border-left-color: var(--error)
+    }
+
+    .toast.info {
+      border-left-color: var(--info)
+    }
+
+    .toast-msg {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.4;
+      flex: 1
+    }
+
+    .toast-close {
+      background: transparent;
+      border: none;
+      color: var(--text-faint);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0;
+      line-height: 1
+    }
+
+    .toast-close:hover {
+      color: var(--text)
+    }
+
+    @keyframes toast-in {
+      from {
+        opacity: 0;
+        transform: translateX(20px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    .toast-out {
+      animation: toast-out .2s ease forwards
+    }
+
+    @keyframes toast-out {
+      to {
+        opacity: 0;
+        transform: translateX(20px)
+      }
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      visibility: hidden;
+      pointer-events: none
+    }
+
+    .drawer-backdrop.open {
+      visibility: visible;
+      pointer-events: all
+    }
+
+    .drawer-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity .3s ease
+    }
+
+    .drawer-backdrop.open .drawer-overlay {
+      opacity: 1
+    }
+
+    .drawer-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 440px;
+      max-width: 100vw;
+      background: rgba(19, 17, 31, .96);
+      backdrop-filter: blur(20px);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(.16, 1, .3, 1)
+    }
+
+    .drawer-backdrop.open .drawer-panel {
+      transform: translateX(0)
+    }
+
+    .drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--divider)
+    }
+
+    .drawer-head h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .drawer-close {
+      width: 32px;
+      height: 32px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: var(--t)
+    }
+
+    .drawer-close:hover {
+      color: var(--text)
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px
+    }
+
+    @media(max-width:1024px) {
+      .tb-nav {
+        display: none;
+      }
+
+      .tb-left {
+        gap: 16px;
+      }
+    }
+
+    /* ── P-2 STYLES ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 14px
+    }
+
+    /* PROFILE */
+    .vf-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px
+    }
+
+    .vf-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px
+    }
+
+    .vf-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .vf-progress {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary)
+    }
+
+    .vf-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .vf-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: var(--t)
+    }
+
+    .vf-step:hover {
+      border-color: rgba(124, 77, 255, .25)
+    }
+
+    .vf-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .vf-dot.done {
+      background: rgba(45, 212, 161, .15);
+      color: var(--success)
+    }
+
+    .vf-dot.pending {
+      background: rgba(255, 179, 71, .15);
+      color: var(--warning)
+    }
+
+    .vf-step-info {
+      flex: 1
+    }
+
+    .vf-step-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px
+    }
+
+    .vf-step-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4
+    }
+
+    .vf-step-unlock {
+      font-size: 10px;
+      color: var(--primary);
+      margin-top: 4px;
+      font-weight: 600
+    }
+
+    .vf-step-action {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding: 4px 0;
+      transition: var(--t)
+    }
+
+    .vf-step-action:hover {
+      text-decoration: underline
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px
+    }
+
+    .detail-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px
+    }
+
+    .detail-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--divider)
+    }
+
+    .detail-row:last-child {
+      border-bottom: none
+    }
+
+    .detail-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0
+    }
+
+    .detail-val {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      text-align: right
+    }
+
+    .badge-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px
+    }
+
+    .skill-badge {
+      padding: 5px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: var(--t);
+      background: transparent;
+      color: var(--text-muted)
+    }
+
+    .skill-badge:hover {
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .skill-badge.sel {
+      background: var(--primary-soft);
+      border-color: rgba(124, 77, 255, .3);
+      color: var(--primary)
+    }
+
+    .edit-btn {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      background: none;
+      border: none;
+      cursor: pointer
+    }
+
+    .edit-btn:hover {
+      text-decoration: underline
+    }
+
+    /* DRIVES */
+    .drives-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px
+    }
+
+    .tpl-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .tpl-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: var(--t)
+    }
+
+    .tpl-btn:hover {
+      background: rgba(255, 255, 255, .04);
+      color: var(--text)
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--t)
+    }
+
+    .btn-primary:hover {
+      background: #6b3de8;
+      box-shadow: 0 0 20px var(--primary-glow)
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--t)
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, .04);
+      color: var(--text)
+    }
+
+    .drive-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: var(--t)
+    }
+
+    .drive-card:hover {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .3)
+    }
+
+    .drive-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px
+    }
+
+    .drive-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .drive-meta {
+      flex: 1
+    }
+
+    .drive-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .drive-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .05em
+    }
+
+    .status-chip.live {
+      background: rgba(45, 212, 161, .12);
+      color: var(--success)
+    }
+
+    .status-chip.draft {
+      background: rgba(255, 255, 255, .06);
+      color: var(--text-faint)
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%
+    }
+
+    .status-chip.live .status-dot {
+      background: var(--success);
+      animation: pulse-d 1.5s infinite
+    }
+
+    .status-chip.draft .status-dot {
+      background: var(--text-faint)
+    }
+
+    @keyframes pulse-d {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(45, 212, 161, .5)
+      }
+
+      50% {
+        box-shadow: 0 0 0 4px rgba(45, 212, 161, 0)
+      }
+    }
+
+    .pipe-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px
+    }
+
+    .pipe-seg {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .pipe-fill {
+      height: 4px;
+      border-radius: 2px;
+      margin-bottom: 6px;
+      min-width: 4px
+    }
+
+    .pipe-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      color: var(--text-muted);
+      text-transform: uppercase
+    }
+
+    .pipe-num {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      font-variant-numeric: tabular-nums lining-nums
+    }
+
+    .pipe-expand {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--divider);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px
+    }
+
+    .pipe-col-head {
+      border: 1px solid;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px
+    }
+
+    .pipe-avatars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px
+    }
+
+    .av {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .av.more {
+      background: var(--surface-2);
+      color: var(--text-faint);
+      border: 1px solid var(--border)
+    }
+
+    .drive-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .no-apps {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 12px;
+      color: var(--text-faint);
+      text-align: center;
+      margin-bottom: 14px
+    }
+
+    /* DRAWER FORM */
+    .form-section {
+      margin-bottom: 20px
+    }
+
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--divider)
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 12px
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted)
+    }
+
+    .form-input {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: var(--t)
+    }
+
+    .form-input:focus {
+      border-color: rgba(124, 77, 255, .4)
+    }
+
+    .form-input::placeholder {
+      color: var(--text-faint)
+    }
+
+    textarea.form-input {
+      resize: vertical;
+      min-height: 100px
+    }
+
+    .form-note {
+      font-size: 10px;
+      color: var(--text-faint);
+      line-height: 1.4;
+      margin-top: 2px
+    }
+
+    .drawer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--divider)
+    }
+
+    /* HUB */
+    .compose-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px
+    }
+
+    .compose-inner {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 14px
+    }
+
+    .compose-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .compose-ta {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      min-height: 70px;
+      transition: var(--t)
+    }
+
+    .compose-ta:focus {
+      border-color: rgba(124, 77, 255, .4)
+    }
+
+    .compose-ta::placeholder {
+      color: var(--text-faint)
+    }
+
+    .compose-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .type-tabs {
+      display: flex;
+      gap: 4px
+    }
+
+    .type-tab {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: var(--t)
+    }
+
+    .type-tab.on {
+      background: var(--primary-soft);
+      border-color: rgba(124, 77, 255, .3);
+      color: var(--primary)
+    }
+
+    .type-tab:not(.on):hover {
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .sponsor-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--warning);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap
+    }
+
+    .sponsor-text h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px
+    }
+
+    .sponsor-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5
+    }
+
+    .sponsor-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--warning);
+      margin-top: 6px
+    }
+
+    .feed-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 12px;
+      transition: var(--t)
+    }
+
+    .feed-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .3)
+    }
+
+    .feed-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px
+    }
+
+    .feed-av {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .feed-co {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .feed-chip {
+      background: var(--primary-soft);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 2px 8px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: .05em;
+      text-transform: uppercase
+    }
+
+    .feed-time {
+      font-size: 11px;
+      color: var(--text-faint);
+      margin-left: auto
+    }
+
+    .feed-body {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 14px
+    }
+
+    .feed-foot {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-top: 1px solid var(--divider);
+      padding-top: 12px
+    }
+
+    .feed-views {
+      font-size: 11px;
+      color: var(--text-faint)
+    }
+
+    @media(max-width:768px) {
+      .profile-grid {
+        grid-template-columns: 1fr
+      }
+
+      .pipe-bar,
+      .pipe-expand {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    /* ── P-3 STYLES ── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      transition: var(--t);
+      cursor: default
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(124, 77, 255, 0.05), transparent);
+      pointer-events: none
+    }
+
+    .kpi-card:hover {
+      border-color: rgba(124, 77, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35)
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px
+    }
+
+    .kpi-num {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 8px
+    }
+
+    .kpi-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 2px 8px
+    }
+
+    .kpi-trend.up {
+      background: rgba(45, 212, 161, 0.12);
+      color: var(--success)
+    }
+
+    .kpi-trend.down {
+      background: rgba(255, 95, 122, 0.12);
+      color: var(--error)
+    }
+
+    .kpi-trend.neutral {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-faint)
+    }
+
+    .kpi-fee {
+      font-size: 10px;
+      color: var(--text-faint);
+      margin-top: 8px
+    }
+
+    .kpi-fee strong {
+      color: var(--warning)
+    }
+
+    .home-mid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px
+    }
+
+    .action-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--warning);
+      border-radius: 16px;
+      padding: 20px
+    }
+
+    .pulse-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px
+    }
+
+    .home-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .action-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--divider)
+    }
+
+    .action-item:last-child {
+      border-bottom: none
+    }
+
+    .action-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--warning);
+      margin-top: 5px;
+      flex-shrink: 0
+    }
+
+    .action-text {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5
+    }
+
+    .action-link {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+
+    .action-link:hover {
+      text-decoration: underline
+    }
+
+    .pulse-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--divider)
+    }
+
+    .pulse-item:last-child {
+      border-bottom: none
+    }
+
+    .pulse-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0
+    }
+
+    .pulse-body {
+      flex: 1
+    }
+
+    .pulse-college {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .pulse-event {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px
+    }
+
+    .pulse-time {
+      font-size: 10px;
+      color: var(--text-faint);
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+
+    .cal-strip-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px
+    }
+
+    .cal-strip-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .cal-sync-link {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-faint);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      transition: var(--t)
+    }
+
+    .cal-sync-link:hover {
+      color: var(--primary)
+    }
+
+    .cal-strip {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr 1px 1fr;
+      gap: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      gap: 16px
+    }
+
+    .cal-month-divider {
+      background: var(--divider);
+      width: 1px
+    }
+
+    .cal-month-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 10px
+    }
+
+    .cal-drive-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px
+    }
+
+    .cal-drive-date {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      width: 40px;
+      flex-shrink: 0
+    }
+
+    .cal-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap
+    }
+
+    .cal-chip.live {
+      background: rgba(45, 212, 161, 0.15);
+      color: var(--success)
+    }
+
+    .cal-chip.draft {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-faint)
+    }
+
+    .cal-empty {
+      font-size: 11px;
+      color: var(--text-faint);
+      font-style: italic;
+      padding: 8px 0
+    }
+
+    .cohort-lock {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 0
+    }
+
+    .cohort-blur-content {
+      filter: blur(4px);
+      pointer-events: none;
+      user-select: none;
+      padding: 24px
+    }
+
+    .cohort-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      padding: 24px;
+      background: rgba(10, 10, 15, 0.72);
+      backdrop-filter: blur(2px)
+    }
+
+    .lock-badge {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 179, 71, 0.12);
+      border: 1px solid rgba(255, 179, 71, 0.25);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px
+    }
+
+    .lock-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .lock-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      max-width: 360px
+    }
+
+    .lock-unlock {
+      font-size: 11px;
+      color: var(--warning);
+      font-weight: 600;
+      background: rgba(255, 179, 71, 0.12);
+      border: 1px solid rgba(255, 179, 71, 0.2);
+      border-radius: 8px;
+      padding: 6px 16px
+    }
+
+    .drives-view-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px
+    }
+
+    .view-tab {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--t)
+    }
+
+    .view-tab.active {
+      background: var(--primary-soft);
+      border-color: rgba(124, 77, 255, 0.3);
+      color: var(--primary)
+    }
+
+    .view-tab:not(.active):hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text)
+    }
+
+    .cal-grid-note {
+      font-size: 11px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      border: 1px solid rgba(124, 77, 255, 0.2);
+      border-radius: 8px;
+      padding: 9px 14px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .cal-grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px
+    }
+
+    .cal-grid-month {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px
+    }
+
+    .cal-grid-month-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px
+    }
+
+    .cal-dow-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      margin-bottom: 4px
+    }
+
+    .cal-dow-cell {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      color: var(--text-faint);
+      text-align: center;
+      padding: 3px 0;
+      text-transform: uppercase
+    }
+
+    .cal-grid-weeks {
+      display: flex;
+      flex-direction: column;
+      gap: 2px
+    }
+
+    .cal-grid-week {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px
+    }
+
+    .cal-grid-day {
+      min-height: 34px;
+      border-radius: 6px;
+      padding: 3px 3px 2px;
+      position: relative;
+      cursor: default
+    }
+
+    .cal-grid-day:not(.empty):hover {
+      background: rgba(255, 255, 255, 0.03)
+    }
+
+    .cal-grid-day.today-cell {
+      background: rgba(124, 77, 255, 0.1)
+    }
+
+    .cal-grid-day.empty {
+      opacity: 0
+    }
+
+    .day-num {
+      font-size: 9px;
+      color: var(--text-faint);
+      line-height: 1;
+      margin-bottom: 2px
+    }
+
+    .today-cell .day-num {
+      color: var(--primary);
+      font-weight: 700
+    }
+
+    .cal-event-chip {
+      font-size: 8px;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      margin-top: 1px;
+      display: block;
+      max-width: 100%;
+      border: none;
+      font-family: inherit;
+      width: 100%;
+      text-align: left
+    }
+
+    .cal-event-chip.live {
+      background: rgba(45, 212, 161, 0.2);
+      color: var(--success)
+    }
+
+    .cal-event-chip.draft {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-faint)
+    }
+
+    .cal-popover {
+      position: fixed;
+      background: rgba(19, 17, 31, 0.98);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      width: 224px;
+      z-index: 9000;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      display: none
+    }
+
+    .cal-popover.show {
+      display: block;
+      animation: fadein .15s ease
+    }
+
+    .cal-popover-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px
+    }
+
+    .cal-popover-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 5px;
+      font-size: 11px;
+      color: var(--text-muted)
+    }
+
+    .cal-popover-row strong {
+      color: var(--text);
+      min-width: 60px
+    }
+
+    .cal-popover-link {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin-top: 10px;
+      display: inline-block;
+      font-family: inherit
+    }
+
+    .cal-popover-link:hover {
+      text-decoration: underline
+    }
+
+    @media(max-width:1200px) {
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .cal-grid-container {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:900px) {
+      .home-mid {
+        grid-template-columns: 1fr
+      }
+
+      .cal-strip {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:600px) {
+      .kpi-row {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .cal-grid-container {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ── COLLEGE MULTI-SELECT ── */
+    .college-select-wrap {
+      position: relative;
+      margin-bottom: 0
+    }
+
+    .college-select-trigger {
+      width: 100%;
+      text-align: left;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: var(--t);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px
+    }
+
+    .college-select-trigger:hover {
+      border-color: rgba(124, 77, 255, .3)
+    }
+
+    .college-chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      flex: 1
+    }
+
+    .college-chip {
+      background: var(--primary-soft);
+      border: 1px solid rgba(124, 77, 255, .25);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .college-chip-x {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      padding: 0 2px;
+      font-size: 13px;
+      line-height: 1;
+      opacity: .7
+    }
+
+    .college-chip-x:hover {
+      opacity: 1
+    }
+
+    .college-ph {
+      font-size: 12px;
+      color: var(--text-faint)
+    }
+
+    .college-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: rgba(13, 11, 25, .98);
+      border: 1px solid rgba(124, 77, 255, .2);
+      border-radius: 14px;
+      z-index: 9999;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
+      backdrop-filter: blur(20px);
+      display: none
+    }
+
+    .college-dropdown.open {
+      display: block;
+      animation: fadein .15s ease
+    }
+
+    .college-dd-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--divider);
+      background: rgba(124, 77, 255, .05)
+    }
+
+    .college-search {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px
+    }
+
+    .college-search::placeholder {
+      color: var(--text-faint)
+    }
+
+    .college-sel-all {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-soft);
+      border: 1px solid rgba(124, 77, 255, .2);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: var(--t)
+    }
+
+    .college-sel-all:hover {
+      background: rgba(124, 77, 255, .25)
+    }
+
+    .college-list {
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 6px
+    }
+
+    .college-list::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .college-list::-webkit-scrollbar-thumb {
+      background: rgba(124, 77, 255, .3);
+      border-radius: 2px
+    }
+
+    .college-opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--t)
+    }
+
+    .college-opt:hover {
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .college-opt.sel {
+      background: var(--primary-soft)
+    }
+
+    .college-cb {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 10px;
+      transition: var(--t)
+    }
+
+    .college-opt.sel .college-cb {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff
+    }
+
+    .college-cname {
+      font-size: 12px;
+      color: var(--text-muted)
+    }
+
+    .college-opt.sel .college-cname {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    /* ── INLINE EDIT ── */
+    .detail-field-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: right
+    }
+
+    .detail-edit-input {
+      display: none;
+      background: var(--surface-2);
+      border: 1px solid rgba(124, 77, 255, .35);
+      border-radius: 6px;
+      padding: 5px 9px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      width: 100%;
+      text-align: right;
+      outline: none;
+      transition: var(--t)
+    }
+
+    .detail-edit-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 77, 255, .12)
+    }
+
+    .edit-active .detail-val {
+      display: none !important
+    }
+
+    .edit-active .detail-edit-input {
+      display: block !important
+    }
+
+    .edit-btn-save {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      padding: 5px 14px;
+      cursor: pointer;
+      transition: var(--t)
+    }
+
+    .edit-btn-save:hover {
+      background: #6b3de8
+    }
+
+    /* ── RECRUITER FOOTER ── */
+    .rec-footer {
+      background: rgba(13, 11, 25, 0.85);
+      border-top: 1px solid transparent;
+      background-clip: padding-box;
+      position: relative;
+      margin-top: 0;
+      display: none;
+      /* shown only on home zone */
+    }
+
+    .rec-footer.home-visible {
+      display: block;
+    }
+
+    .rec-footer-divider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(124, 77, 255, 0.35) 30%, rgba(139, 109, 255, 0.5) 50%, rgba(124, 77, 255, 0.35) 70%, transparent);
+      pointer-events: none;
+    }
+
+    .rec-footer-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 200px;
+      background: radial-gradient(ellipse at top, rgba(124, 77, 255, 0.06), transparent 70%);
+      pointer-events: none;
+    }
+
+    .rec-footer-inner {
+      position: relative;
+      padding: 52px 28px 0;
+    }
+
+    .rec-footer-grid {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 44px;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .rec-footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .rec-footer-brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .rec-footer-brand-icon {
+      width: 34px;
+      height: 34px;
+      background: rgba(124, 77, 255, 0.15);
+      border: 1px solid rgba(124, 77, 255, 0.25);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rec-footer-brand-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      color: var(--text);
+    }
+
+    .rec-footer-brand-sub {
+      font-size: 10px;
+      color: var(--text-faint);
+      letter-spacing: .05em;
+      margin-top: 1px;
+    }
+
+    .rec-footer-brand-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 220px;
+    }
+
+    .rec-footer-socials {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .rec-footer-social {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-faint);
+      transition: var(--t);
+    }
+
+    .rec-footer-social:hover {
+      background: rgba(124, 77, 255, 0.1);
+      color: var(--primary);
+      border-color: rgba(124, 77, 255, 0.25);
+    }
+
+    .rec-footer-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding-top: 4px;
+    }
+
+    .rec-footer-col h4 {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 18px;
+    }
+
+    .rec-footer-col a {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: var(--t);
+      width: fit-content;
+    }
+
+    .rec-footer-col a:hover {
+      color: var(--primary);
+    }
+
+    .rec-footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .rec-footer-copy {
+      font-size: 11px;
+      color: var(--text-faint);
+      font-weight: 500;
+      letter-spacing: .02em;
+    }
+
+    .rec-footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .rec-footer-links a {
+      font-size: 11px;
+      color: var(--text-faint);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--t);
+    }
+
+    .rec-footer-links a:hover {
+      color: var(--text-muted);
+    }
+
+    @media(max-width:900px) {
+      .rec-footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px
+      }
+    }
+
+    @media(max-width:600px) {
+      .rec-footer-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .co-welcome-sub {
+      font-size: 11px;
+      color: var(--text-muted)
+    }
+
+    .co-welcome-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(45, 212, 161, .1);
+      border: 1px solid rgba(45, 212, 161, .2);
+      border-radius: 5px;
+      padding: 2px 8px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--success);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-left: 8px
+    }
+
+    .co-welcome-right {
+      margin-left: auto;
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .co-welcome-date {
+      font-size: 11px;
+      color: var(--text-muted)
+    }
+
+    .co-welcome-time {
+      font-size: 10px;
+      color: var(--text-faint);
+      margin-top: 2px
+    }
+
+    /* ANALYTICS */
+    .analytics-wrap {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid var(--divider)
+    }
+
+    .analytics-hdr {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 6px
+    }
+
+    .analytics-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .analytics-live {
+      font-size: 10px;
+      color: var(--success);
+      background: rgba(45, 212, 161, .1);
+      border: 1px solid rgba(45, 212, 161, .2);
+      border-radius: 5px;
+      padding: 3px 9px;
+      font-weight: 700;
+      letter-spacing: .06em
+    }
+
+    .analytics-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.55
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px
+    }
+
+    .an-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .an-card::after {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(124, 77, 255, .05), transparent 65%);
+      pointer-events: none
+    }
+
+    .an-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 7px
+    }
+
+    .an-card-hint {
+      font-size: 10px;
+      color: var(--text-faint);
+      margin-bottom: 16px
+    }
+
+    .funnel-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--t)
+    }
+
+    .funnel-row:hover,
+    .funnel-row.on {
+      background: rgba(124, 77, 255, .06);
+      border: 1px solid rgba(124, 77, 255, .12)
+    }
+
+    .funnel-row:not(:hover):not(.on) {
+      border: 1px solid transparent
+    }
+
+    .funnel-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .funnel-lbl {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .funnel-num {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+      font-variant-numeric: tabular-nums
+    }
+
+    .funnel-track {
+      height: 7px;
+      background: rgba(255, 255, 255, .04);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 2px
+    }
+
+    .funnel-bar {
+      height: 100%;
+      border-radius: 4px
+    }
+
+    .funnel-drop {
+      font-size: 10px;
+      color: var(--text-faint)
+    }
+
+    .col-row {
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--t)
+    }
+
+    .col-row:hover,
+    .col-row.on {
+      background: rgba(124, 77, 255, .06)
+    }
+
+    .col-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px
+    }
+
+    .col-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .col-rate {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 4px
+    }
+
+    .rate-hi {
+      background: rgba(45, 212, 161, .12);
+      color: var(--success)
+    }
+
+    .rate-md {
+      background: rgba(255, 179, 71, .12);
+      color: var(--warning)
+    }
+
+    .rate-lo {
+      background: rgba(255, 95, 122, .12);
+      color: var(--error)
+    }
+
+    .col-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 3px
+    }
+
+    .col-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .col-bar-lbl {
+      font-size: 9px;
+      color: var(--text-faint);
+      width: 52px;
+      flex-shrink: 0
+    }
+
+    .col-bar-track {
+      flex: 1;
+      height: 5px;
+      background: rgba(255, 255, 255, .04);
+      border-radius: 3px;
+      overflow: hidden
+    }
+
+    .col-bar-fill {
+      height: 100%;
+      border-radius: 3px
+    }
+
+    .an-detail {
+      display: none;
+      background: rgba(124, 77, 255, .04);
+      border: 1px solid rgba(124, 77, 255, .12);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 10px;
+      animation: fadein .2s ease
+    }
+
+    .an-detail.show {
+      display: block
+    }
+
+    .an-detail-stats {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap
+    }
+
+    .an-stat {
+      flex: 1;
+      min-width: 60px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center
+    }
+
+    .an-stat-num {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .an-stat-lbl {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--text-faint);
+      margin-top: 2px
+    }
+
+    .an-insight {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      padding: 8px 10px;
+      background: rgba(45, 212, 161, .04);
+      border-left: 2px solid var(--success);
+      border-radius: 0 6px 6px 0
+    }
+
+    /* BULK SHORTLIST */
+    .bulk-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--primary-soft);
+      border: 1px solid rgba(124, 77, 255, .25);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      animation: fadein .2s ease
+    }
+
+    .bulk-count {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary)
+    }
+
+    .bulk-btns {
+      display: flex;
+      gap: 6px;
+      margin-left: auto
+    }
+
+    .bulk-btn {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      transition: var(--t)
+    }
+
+    .bb-short {
+      background: var(--primary);
+      color: #fff
+    }
+
+    .bb-short:hover {
+      background: #6b3de8
+    }
+
+    .bb-rej {
+      background: rgba(255, 95, 122, .1);
+      color: var(--error);
+      border: 1px solid rgba(255, 95, 122, .2)
+    }
+
+    .bb-rej:hover {
+      background: var(--error);
+      color: #fff
+    }
+
+    .bb-exp {
+      background: rgba(255, 255, 255, .05);
+      color: var(--text-muted);
+      border: 1px solid var(--border)
+    }
+
+    .bb-exp:hover {
+      color: var(--text)
+    }
+
+    .cand-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: var(--t);
+      margin-bottom: 5px
+    }
+
+    .cand-card:hover,
+    .cand-card.sel {
+      border-color: rgba(124, 77, 255, .3)
+    }
+
+    .cand-card.sel {
+      background: rgba(124, 77, 255, .06)
+    }
+
+    .cand-cb {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      flex-shrink: 0;
+      transition: var(--t)
+    }
+
+    .cand-card.sel .cand-cb {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff
+    }
+
+    .cand-av {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .cand-info {
+      flex: 1
+    }
+
+    .cand-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .cand-sub {
+      font-size: 10px;
+      color: var(--text-muted)
+    }
+
+    .cand-score {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: rgba(45, 212, 161, .1);
+      color: var(--success);
+      margin-left: auto
+    }
+
+    @media(max-width:900px) {
+      .analytics-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* UPGRADE NUDGE CARD */
+    .upgrade-nudge {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, rgba(124, 77, 255, .07), rgba(245, 158, 11, .04));
+      border: 1px solid rgba(124, 77, 255, .18);
+      border-radius: 14px;
+      margin-bottom: 20px;
+      position: relative
+    }
+
+    .upgrade-nudge-icon {
+      font-size: 22px;
+      flex-shrink: 0
+    }
+
+    .upgrade-nudge-body {
+      flex: 1
+    }
+
+    .upgrade-nudge-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 2px
+    }
+
+    .upgrade-nudge-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5
+    }
+
+    .upgrade-nudge-cta {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 7px 16px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: var(--t);
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+
+    .upgrade-nudge-cta:hover {
+      background: #6b3de8
+    }
+
+    .upgrade-nudge-close {
+      width: 24px;
+      height: 24px;
+      background: none;
+      border: none;
+      color: var(--text-faint);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: var(--t);
+      border-radius: 4px
+    }
+
+    .upgrade-nudge-close:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, .06)
+    }
+
+    /* PROFILE BUTTON FIX - horizontal layout */
+    .tb-profile-btn {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+      gap: 10px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid rgba(255, 255, 255, .06);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: var(--t)
+    }
+
+    .tb-profile-btn:hover {
+      background: rgba(255, 255, 255, .07);
+      border-color: rgba(124, 77, 255, .25)
+    }
+
+    .tb-profile-av {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, #7c4dff, #4a25d4);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .tb-profile-text {
+      line-height: 1.2;
+      flex-shrink: 0
+    }
+
+    .tb-profile-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap
+    }
+
+    .tb-profile-role {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap
+    }
+
+    /* TOGGLE BUTTON in actions area */
+    .tb-toggle-btn {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: var(--t);
+      flex-shrink: 0
+    }
+
+    .tb-toggle-btn:hover {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: rgba(124, 77, 255, .3)
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="tb-left">
+      <div class="tb-brand-wrap">
+        <div class="tb-brand-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg></div>
+        <span class="tb-brand-name">AEGIS</span>
+        <span class="tb-brand-rec">Recruiter</span>
+      </div>
+
+      <nav class="tb-nav">
+        <button class="tb-nav-item active" data-zone="home" onclick="switchZone('home')">Home</button>
+        <button class="tb-nav-item" data-zone="talent" onclick="switchZone('talent')">Talent Discovery</button>
+        <button class="tb-nav-item" data-zone="drives" onclick="switchZone('drives')">My Drives</button>
+        <button class="tb-nav-item" data-zone="insights" onclick="switchZone('insights')">College Insights</button>
+        <button class="tb-nav-item" data-zone="hub" onclick="switchZone('hub')">Community Hub</button>
+        <button class="tb-nav-item" data-zone="profile" onclick="switchZone('profile')">Company Profile</button>
+      </nav>
+    </div>
+
+    <div class="tb-right">
+      <button class="notif-btn" onclick="showToast('3 new applicants since yesterday','info')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 01-3.46 0" />
+        </svg>
+        <span class="notif-dot">3</span>
+      </button>
+      <div class="tb-divider"></div>
+      <div class="tb-profile-btn" onclick="switchZone('profile')" title="Account Settings">
+        <div class="tb-profile-text">
+          <div class="tb-profile-name">Priya Sharma</div>
+          <div class="tb-profile-role">Persistent Systems</div>
+        </div>
+        <div class="tb-profile-av">PS</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO BACKGROUNDS -->
+  <div class="hero-bg"></div>
+  <div class="hero-bg-2"></div>
+
+  <main class="main" id="main-content">
+    <!-- ZONE: HOME COMMAND CENTRE -->
+    <div id="zone-home" class="zone active">
+
+      <!-- HERO SECTION -->
+      <section class="hero-section">
+        <div class="hero-trust-badge">
+          <div class="hero-avatars">
+            <div class="hero-av" style="background:#7c4dff">M</div>
+            <div class="hero-av" style="background:#2dd4a1">G</div>
+            <div class="hero-av" style="background:#f59e0b">I</div>
+          </div>
+          <div class="hero-trust-text">Trusted by 500+ leading tech companies</div>
+        </div>
+
+        <h1 class="hero-title">Hire top talent with <span>AEGIS</span></h1>
+        <p class="hero-desc">AI-powered campus recruitment operating system. Source, assess, and hire exceptional
+          candidates in one sleek interface.</p>
+
+        <div class="hero-actions">
+          <button class="hero-btn-primary" onclick="showToast('New Drive flow opening...','info')">
+            Post a Drive
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+          <button class="hero-btn-secondary" onclick="switchZone('talent')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Discover Talent
+          </button>
+        </div>
+      </section>
+
+      <div class="dashboard-header">
+        <div class="dh-left">
+          <h2><span>Dashboard</span> Overview</h2>
+          <p>Welcome back, Priya. Here's what's happening today.</p>
+        </div>
+      </div>
+
+      <!-- Company Welcome Card (Simplified & pushed down) -->
+      <div class="co-welcome">
+        <div class="co-welcome-av">PS</div>
+        <div>
+          <div class="co-welcome-label">Recruiter Dashboard</div>
+          <div class="co-welcome-name">Persistent Systems</div>
+          <div class="co-welcome-sub">Campus Recruitment Lead · Priya Sharma <span class="co-welcome-badge">&#9679;
+              Verified</span></div>
+        </div>
+        <div class="co-welcome-right">
+          <div class="co-welcome-date" id="welcome-date"></div>
+          <div class="co-welcome-time">Logged in as <strong>Recruiter</strong></div>
+        </div>
+      </div>
+      <!-- KPI Row -->
+      <div class="kpi-row">
+        <!-- API: GET /recruiter/kpi/active-drives -->
+        <div class="kpi-card">
+          <div class="kpi-label">Active Drives</div>
+          <div class="kpi-num" id="kpi-drives">2</div>
+          <span class="kpi-trend up">&#8593; +1 vs last month</span>
+        </div>
+        <!-- API: GET /recruiter/kpi/total-applicants -->
+        <div class="kpi-card">
+          <div class="kpi-label">Total Applicants</div>
+          <div class="kpi-num" id="kpi-applicants">23</div>
+          <span class="kpi-trend up">&#8593; +8 this week</span>
+        </div>
+        <!-- API: GET /recruiter/kpi/shortlisted -->
+        <div class="kpi-card">
+          <div class="kpi-label">Shortlisted</div>
+          <div class="kpi-num" id="kpi-shortlisted">8</div>
+          <span class="kpi-trend neutral">&#8594; No change</span>
+        </div>
+        <!-- API: GET /recruiter/kpi/confirmed-hires -->
+        <div class="kpi-card">
+          <div class="kpi-label">Confirmed Hires</div>
+          <div class="kpi-num" id="kpi-hires">1</div>
+          <span class="kpi-trend up">&#8593; +1 this drive</span>
+          <!-- API: GET /recruiter/kpi/pending-outcome-fee -->
+          <div class="kpi-fee">Outcome fee pending: <strong>&#8377;18,000</strong></div>
+        </div>
+      </div>
+
+      <!-- Middle Row: Pending Actions + College Pulse -->
+      <div class="home-mid">
+        <!-- API: GET /recruiter/pending-actions -->
+        <div class="action-card">
+          <div class="home-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            Pending Actions
+            <span
+              style="margin-left:auto;background:rgba(255,179,71,0.15);color:var(--warning);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700">3
+              items</span>
+          </div>
+          <!-- API: /recruiter/pending-actions — item: shortlisted-no-contact -->
+          <div class="action-item">
+            <div class="action-dot"></div>
+            <div class="action-text">4 shortlisted candidates for the Infosys SDE drive have had no contact initiated
+              yet.</div>
+            <button class="action-link" onclick="switchZone('drives')">View &#8594;</button>
+          </div>
+          <!-- API: /recruiter/pending-actions — item: drive-closing-soon -->
+          <div class="action-item">
+            <div class="action-dot"></div>
+            <div class="action-text">Infosys SDE drive closes in <strong style="color:var(--text)">14 days</strong> —
+              only 1 of 40 slots confirmed.</div>
+            <button class="action-link" onclick="switchZone('drives')">Manage &#8594;</button>
+          </div>
+          <!-- API: /recruiter/pending-actions — item: draft-drive -->
+          <div class="action-item">
+            <div class="action-dot"></div>
+            <div class="action-text">Bosch Embedded Engineer drive is still in Draft — publish to start receiving
+              applications.</div>
+            <button class="action-link" onclick="switchZone('drives')">Publish &#8594;</button>
+          </div>
+        </div>
+
+        <!-- API: GET /colleges/activity-feed -->
+        <div class="pulse-card">
+          <div class="home-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            College Activity Pulse
+            <span
+              style="margin-left:auto;width:7px;height:7px;background:var(--success);border-radius:50%;animation:pulse-d 1.5s infinite;display:inline-block"></span>
+          </div>
+          <!-- API: /colleges/activity-feed — item 1 -->
+          <div class="pulse-item">
+            <div class="pulse-icon" style="background:rgba(77,166,255,0.12)">&#127891;</div>
+            <div class="pulse-body">
+              <div class="pulse-college">MIT Pune</div>
+              <div class="pulse-event">12 new verified student profiles added</div>
+            </div>
+            <div class="pulse-time">8m ago</div>
+          </div>
+          <!-- API: /colleges/activity-feed — item 2 -->
+          <div class="pulse-item">
+            <div class="pulse-icon" style="background:rgba(45,212,161,0.12)">&#128197;</div>
+            <div class="pulse-body">
+              <div class="pulse-college">COEP Pune</div>
+              <div class="pulse-event">Drive date confirmed for May 28</div>
+            </div>
+            <div class="pulse-time">1h ago</div>
+          </div>
+          <!-- API: /colleges/activity-feed — item 3 -->
+          <div class="pulse-item">
+            <div class="pulse-icon" style="background:rgba(124,77,255,0.12)">&#127885;</div>
+            <div class="pulse-body">
+              <div class="pulse-college">VIT Pune</div>
+              <div class="pulse-event">3 students upgraded to Gold Integrity Badge</div>
+            </div>
+            <div class="pulse-time">3h ago</div>
+          </div>
+          <!-- API: /colleges/activity-feed — item 4 -->
+          <div class="pulse-item">
+            <div class="pulse-icon" style="background:rgba(255,179,71,0.12)">&#128203;</div>
+            <div class="pulse-body">
+              <div class="pulse-college">Symbiosis Institute</div>
+              <div class="pulse-event">Placement coordinator profile verified</div>
+            </div>
+            <div class="pulse-time">5h ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Month Calendar Strip -->
+      <!-- API: GET /recruiter/drives?view=calendar&months=3&from=2026-05 -->
+      <div class="cal-strip-header">
+        <span class="cal-strip-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          Placement Season — May to July 2026
+        </span>
+        <a class="cal-sync-link" href="#" onclick="showToast('Google Calendar sync — coming soon','info');return false">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          Sync to Google Calendar
+        </a>
+      </div>
+      <div class="cal-strip" id="home-cal-strip"><!-- rendered by buildHomeCalStrip() --></div>
+
+      <!-- Cohort Benchmarking Upgrade Nudge -->
+      <div class="upgrade-nudge" id="upgrade-nudge">
+        <div class="upgrade-nudge-icon">&#128274;</div>
+        <div class="upgrade-nudge-body">
+          <div class="upgrade-nudge-title">Cohort Benchmarking Locked</div>
+          <div class="upgrade-nudge-desc">Compare your acceptance rate, time-to-hire &amp; campus reach vs. 50+ active
+            recruiters. Confirm your first hire to unlock.</div>
+        </div>
+        <button class="upgrade-nudge-cta"
+          onclick="switchZone('profile');showToast('View your plan in Company Profile','info')">Upgrade Plan
+          &#8594;</button>
+        <button class="upgrade-nudge-close" onclick="document.getElementById('upgrade-nudge').style.display='none'"
+          title="Dismiss">&times;</button>
+      </div>
+      <!-- Hiring Analytics — only visible on home zone -->
+      <div class="analytics-wrap">
+        <div class="analytics-hdr"><span class="analytics-title">&#9650; Hiring Analytics</span><span
+            class="analytics-live">&#9679; LIVE DATA</span></div>
+        <p class="analytics-desc">Track where candidates drop off across your pipeline and identify which campus
+          partnerships deliver the highest ROI. Click any row for a detailed breakdown.</p>
+        <div class="analytics-grid">
+          <div class="an-card">
+            <div class="an-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="var(--primary)" stroke-width="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>Application Funnel</div>
+            <div class="an-card-hint">Click a stage to see who dropped off and why</div>
+            <div id="funnel-wrap"></div>
+            <div class="an-detail" id="funnel-detail"></div>
+          </div>
+          <div class="an-card">
+            <div class="an-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="var(--primary)" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              </svg>College-wise Conversion</div>
+            <div class="an-card-hint">Applied vs. Selected rate by institution &mdash; click for full stats</div>
+            <div id="college-chart-wrap"></div>
+            <div class="an-detail" id="college-detail"></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /zone-home -->
+    <div id="zone-talent" class="zone">
+      <div class="ph-zone">
+        <div class="ph-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg></div>
+        <div class="ph-title">Talent Discovery</div>
+        <div class="ph-sub">Zone: Talent — Status: Being built in P-3</div>
+        <div class="ph-badge">Placeholder</div>
+      </div>
+    </div>
+    <!-- ZONE: MY DRIVES -->
+    <div id="zone-drives" class="zone">
+      <!-- API: GET /recruiter/drives — all drives for this recruiter -->
+      <div class="drives-top">
+        <div>
+          <div class="section-label">Quick Start Templates →</div>
+          <div class="tpl-row">
+            <button class="tpl-btn" onclick="openPostDrive('sde')">💻 SDE Campus Drive</button>
+            <button class="tpl-btn" onclick="openPostDrive('embedded')">⚙️ Embedded Engineer</button>
+            <button class="tpl-btn" onclick="openPostDrive('data')">📊 Data Analyst</button>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="openPostDrive(null)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Post New Drive
+        </button>
+      </div>
+
+      <!-- Drive View Tabs -->
+      <div class="drives-view-tabs">
+        <button class="view-tab active" id="tab-list" onclick="switchDriveView('list')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6" />
+            <line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+            <line x1="3" y1="18" x2="3.01" y2="18" />
+          </svg>
+          List View
+        </button>
+        <button class="view-tab" id="tab-cal" onclick="switchDriveView('calendar')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          Calendar View
+        </button>
+      </div>
+
+      <!-- List View wrapper -->
+      <div id="drives-list-view">
+
+        <!-- Drive 1: Infosys — LIVE -->
+        <!-- API: GET /drives/infosys-sde-2026 -->
+        <div class="drive-card" id="drive-infosys">
+          <div class="drive-head">
+            <div class="drive-icon" style="background:linear-gradient(135deg,var(--primary),#4a25d4)">I</div>
+            <div class="drive-meta">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="drive-title">Infosys — Software Development Engineer</span>
+                <span class="status-chip live"><span class="status-dot"></span>LIVE</span>
+              </div>
+              <div class="drive-info">📅 May 28, 2026 · 🏫 MIT Pune, COEP · 👥 40 slots · posted 3 days ago</div>
+            </div>
+          </div>
+          <!-- API: GET /drives/infosys-sde-2026/pipeline -->
+          <div class="pipe-bar">
+            <div class="pipe-seg">
+              <div class="pipe-fill" style="width:100%;background:#4da6ff"></div><span
+                class="pipe-lbl">Applied</span><span class="pipe-num">23</span>
+            </div>
+            <div class="pipe-seg">
+              <div class="pipe-fill" style="width:35%;background:#7c4dff"></div><span
+                class="pipe-lbl">Shortlisted</span><span class="pipe-num">8</span>
+            </div>
+            <div class="pipe-seg">
+              <div class="pipe-fill" style="width:9%;background:#ffb347"></div><span
+                class="pipe-lbl">Offered</span><span class="pipe-num">2</span>
+            </div>
+            <div class="pipe-seg">
+              <div class="pipe-fill" style="width:4%;background:#2dd4a1"></div><span class="pipe-lbl">Hired</span><span
+                class="pipe-num">1</span>
+            </div>
+          </div>
+          <div class="drive-actions">
+            <button class="btn-ghost" style="font-size:12px;padding:7px 14px" onclick="togglePipeline('infosys')">View
+              Pipeline</button>
+            <button class="btn-ghost" style="font-size:12px;padding:7px 14px" onclick="openPostDrive('sde')">✏
+              Edit</button>
+          </div>
+          <!-- Inline pipeline expand with bulk shortlist -->
+          <div id="pipeline-infosys" style="display:none">
+            <div id="bulk-bar-infosys" class="bulk-bar" style="display:none">
+              <span class="bulk-count" id="bulk-count-infosys">0 selected</span>
+              <div class="bulk-btns">
+                <button class="bulk-btn bb-short" onclick="bulkAction('infosys','shortlist')">&#9650; Shortlist</button>
+                <button class="bulk-btn bb-rej" onclick="bulkAction('infosys','reject')">&#10005; Reject</button>
+                <button class="bulk-btn bb-exp" onclick="bulkAction('infosys','export')">&#8681; Export CSV</button>
+              </div>
+            </div>
+            <div id="cand-list-infosys">
+              <div class="cand-card" onclick="toggleCand(this,'infosys')">
+                <div class="cand-cb"></div>
+                <div class="cand-av" style="background:#4da6ff">AK</div>
+                <div class="cand-info">
+                  <div class="cand-name">Aryan Kulkarni</div>
+                  <div class="cand-sub">COEP Pune &middot; CGPA 8.9 &middot; Applied</div>
+                </div><span class="cand-score">92/100</span>
+              </div>
+              <div class="cand-card" onclick="toggleCand(this,'infosys')">
+                <div class="cand-cb"></div>
+                <div class="cand-av" style="background:#7c4dff">PR</div>
+                <div class="cand-info">
+                  <div class="cand-name">Priya Rane</div>
+                  <div class="cand-sub">MIT Pune &middot; CGPA 9.1 &middot; Shortlisted</div>
+                </div><span class="cand-score">96/100</span>
+              </div>
+              <div class="cand-card" onclick="toggleCand(this,'infosys')">
+                <div class="cand-cb"></div>
+                <div class="cand-av" style="background:#4da6ff">SM</div>
+                <div class="cand-info">
+                  <div class="cand-name">Sahil More</div>
+                  <div class="cand-sub">VIT Pune &middot; CGPA 7.8 &middot; Applied</div>
+                </div><span class="cand-score">78/100</span>
+              </div>
+              <div class="cand-card" onclick="toggleCand(this,'infosys')">
+                <div class="cand-cb"></div>
+                <div class="cand-av" style="background:#ffb347">KJ</div>
+                <div class="cand-info">
+                  <div class="cand-name">Kavya Joshi</div>
+                  <div class="cand-sub">COEP Pune &middot; CGPA 8.4 &middot; Offered</div>
+                </div><span class="cand-score">88/100</span>
+              </div>
+              <div class="cand-card" onclick="toggleCand(this,'infosys')">
+                <div class="cand-cb"></div>
+                <div class="cand-av" style="background:#7c4dff">AS</div>
+                <div class="cand-info">
+                  <div class="cand-name">Aditya Shah</div>
+                  <div class="cand-sub">MIT Pune &middot; CGPA 8.7 &middot; Shortlisted</div>
+                </div><span class="cand-score">84/100</span>
+              </div>
+              <div style="font-size:11px;color:var(--text-faint);padding:8px 12px;">+18 more candidates &mdash; <button
+                  style="background:none;border:none;color:var(--primary);font-size:11px;font-weight:600;cursor:pointer"
+                  onclick="showToast('Full candidate list loading…','info')">View All</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drive 2: Bosch — DRAFT -->
+        <!-- API: GET /drives/bosch-embedded-2026 -->
+        <div class="drive-card" id="drive-bosch">
+          <div class="drive-head">
+            <div class="drive-icon"
+              style="background:linear-gradient(135deg,#2a2a3a,#1a1828);border:1px solid var(--border)">B</div>
+            <div class="drive-meta">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="drive-title">Bosch — Embedded Engineer</span>
+                <span class="status-chip draft"><span class="status-dot"></span>DRAFT</span>
+              </div>
+              <div class="drive-info">📅 Jun 15, 2026 · 🏫 VIT Pune · 👥 25 slots</div>
+            </div>
+          </div>
+          <div class="no-apps">No applicants yet — publish to start receiving applications</div>
+          <div class="drive-actions">
+            <button class="btn-ghost" style="font-size:12px;padding:7px 14px" onclick="openPostDrive('embedded')">✏
+              Edit</button>
+            <button class="btn-primary" style="margin-left:auto" onclick="publishDraftDrive()">Publish Drive →</button>
+          </div>
+        </div>
+
+      </div><!-- /drives-list-view -->
+
+      <!-- Drive Calendar View -->
+      <!-- API: GET /recruiter/drives?view=calendar -->
+      <div id="drives-cal-view" style="display:none">
+        <div class="cal-grid-note">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          Drive dates sync to student prep roadmaps automatically — students see this on their Upcoming Drives screen
+          the moment you publish.
+        </div>
+        <!-- API: GET /recruiter/drives — rendered as monthly grid -->
+        <div class="cal-grid-container" id="drive-cal-grid"><!-- rendered by buildDriveCalGrid() --></div>
+      </div>
+    </div>
+    <div id="zone-insights" class="zone">
+      <div class="ph-zone">
+        <div class="ph-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+            <line x1="4" y1="22" x2="4" y2="15" />
+          </svg></div>
+        <div class="ph-title">College Insights</div>
+        <div class="ph-sub">Zone: Insights — Status: Being built in P-5</div>
+        <div class="ph-badge">Placeholder</div>
+      </div>
+    </div>
+    <!-- ZONE: COMMUNITY HUB -->
+    <div id="zone-hub" class="zone">
+      <!-- Post Composer -->
+      <!-- API: POST /community/posts -->
+      <div class="compose-card" id="compose-card">
+        <div class="compose-inner">
+          <div class="compose-av">PS</div>
+          <textarea class="compose-ta" id="compose-ta"
+            placeholder="Share a hiring update, campus visit announcement, or company news…" rows="3"></textarea>
+        </div>
+        <div style="margin-bottom:12px">
+          <div class="section-label" style="margin-bottom:8px">Post type</div>
+          <div class="type-tabs">
+            <button class="type-tab on" onclick="setPostType(this)">📢 Drive Announcement</button>
+            <button class="type-tab" onclick="setPostType(this)">🎪 Event Sponsorship</button>
+            <button class="type-tab" onclick="setPostType(this)">📝 General Update</button>
+          </div>
+        </div>
+        <div class="compose-bar">
+          <div style="font-size:10px;color:var(--text-faint)">Posts appear on Student Company Feed &amp; College
+            Dashboard</div>
+          <button class="btn-primary" onclick="submitPost()">Post Announcement</button>
+        </div>
+      </div>
+
+      <!-- Event Sponsorship Banner -->
+      <!-- API: GET /sponsorships/available -->
+      <div class="sponsor-banner">
+        <div class="sponsor-text">
+          <h3>🎪 Sponsor a hackathon or tech fest at a registered college</h3>
+          <p>Companies get brand visibility + priority candidate discovery. Connect with 500+ active students per event.
+          </p>
+          <div class="sponsor-price">₹25,000 – ₹1,00,000 per event</div>
+        </div>
+        <button class="btn-ghost">Explore Sponsorships →</button>
+      </div>
+
+      <!-- Feed -->
+      <div class="section-label">Community Feed</div>
+      <!-- API: GET /community/posts — load community feed -->
+
+      <!-- Post 1 -->
+      <div class="feed-card">
+        <div class="feed-head">
+          <div class="feed-av" style="background:var(--primary)">PS</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="feed-co">Persistent Systems</span>
+              <span class="feed-chip">Verified Recruiter</span>
+            </div>
+          </div>
+          <span class="feed-time">3h ago</span>
+        </div>
+        <div class="feed-body">We're visiting 5 Pune engineering colleges this June for our Backend Engineer drive.
+          Students — your Aegis prep roadmap will be live before our arrival. 📍 MIT Pune, COEP, VIT Pune, Symbiosis,
+          PICT</div>
+        <div class="feed-foot"><span class="feed-views">👁 142 views</span></div>
+      </div>
+
+      <!-- Post 2 -->
+      <!-- API: GET /community/posts/:id -->
+      <div class="feed-card">
+        <div class="feed-head">
+          <div class="feed-av" style="background:#0070cc">KP</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="feed-co">KPIT Technologies</span>
+              <span class="feed-chip">Verified Recruiter</span>
+            </div>
+          </div>
+          <span class="feed-time">1d ago</span>
+        </div>
+        <div class="feed-body">Embedded &amp; Automotive roles open for 2026 batch. Looking specifically for students
+          with RTOS + Control Systems badge on Aegis. Your Integrity Badge is your shortlist signal.</div>
+        <div class="feed-foot"><span class="feed-views">👁 89 views</span></div>
+      </div>
+
+      <!-- Post 3 -->
+      <div class="feed-card">
+        <div class="feed-head">
+          <div class="feed-av" style="background:#c00">BI</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="feed-co">Bosch India</span>
+              <span class="feed-chip">Verified Recruiter</span>
+            </div>
+          </div>
+          <span class="feed-time">2d ago</span>
+        </div>
+        <div class="feed-body">Our Pune R&amp;D team is expanding. Pre-placement talks scheduled at VIT Pune and MIT
+          Pune in June. Register interest via your college placement cell.</div>
+        <div class="feed-foot"><span class="feed-views">👁 67 views</span></div>
+      </div>
+    </div>
+    <!-- ZONE: COMPANY PROFILE -->
+    <div id="zone-profile" class="zone">
+      <!-- API: GET /recruiter/verification-status -->
+      <div class="vf-card">
+        <div class="vf-header">
+          <span class="vf-title">Verification Status</span>
+          <span class="vf-progress">4 of 5 complete</span>
+        </div>
+        <div class="vf-steps">
+          <div class="vf-step">
+            <div class="vf-dot done">✓</div>
+            <div class="vf-step-info">
+              <div class="vf-step-name">Email Verified</div>
+              <div class="vf-step-desc">Company email domain confirmed</div>
+              <div class="vf-step-unlock">🔓 Unlocked: Account access &amp; basic profile</div>
+            </div>
+          </div>
+          <div class="vf-step">
+            <div class="vf-dot done">✓</div>
+            <div class="vf-step-info">
+              <div class="vf-step-name">Company Details</div>
+              <div class="vf-step-desc">Legal name, CIN, address submitted</div>
+              <div class="vf-step-unlock">🔓 Unlocked: Post drives &amp; view candidate lists</div>
+            </div>
+          </div>
+          <div class="vf-step">
+            <div class="vf-dot done">✓</div>
+            <div class="vf-step-info">
+              <div class="vf-step-name">HR Authorization Letter</div>
+              <div class="vf-step-desc">Official letter on company letterhead uploaded</div>
+              <div class="vf-step-unlock">🔓 Unlocked: Contact candidates directly</div>
+            </div>
+          </div>
+          <div class="vf-step">
+            <div class="vf-dot done">✓</div>
+            <div class="vf-step-info">
+              <div class="vf-step-name">GSTIN / PAN Verification</div>
+              <div class="vf-step-desc">Tax identity document verified</div>
+              <div class="vf-step-unlock">🔓 Unlocked: Verified Recruiter badge on all posts</div>
+            </div>
+          </div>
+          <div class="vf-step">
+            <div class="vf-dot pending">!</div>
+            <div class="vf-step-info">
+              <div class="vf-step-name">Admin Approval</div>
+              <div class="vf-step-desc">Aegis team manual review — typically 24–48 hours</div>
+              <div class="vf-step-unlock">🔒 Locks: Benchmarking data, priority placement slots, sponsorship access
+              </div>
+            </div>
+            <button class="vf-step-action"
+              onclick="showToast('Admin review is in progress. You\'ll be notified by email.','info')">Check Status
+              →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Company Details -->
+      <!-- API: GET /recruiter/company-profile -->
+      <div class="profile-grid">
+        <div class="detail-card" id="company-detail-card">
+          <h3>Company Details <button class="edit-btn" id="company-edit-btn" style="float:right"
+              onclick="toggleCompanyEdit()">Edit</button></h3>
+          <div class="detail-row"><span class="detail-label">Legal Name</span>
+            <div class="detail-field-wrap"><span class="detail-val">Persistent Systems Ltd.</span><input
+                class="detail-edit-input" value="Persistent Systems Ltd." /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">CIN</span>
+            <div class="detail-field-wrap"><span class="detail-val">L72300PN2000PLC015926</span><input
+                class="detail-edit-input" value="L72300PN2000PLC015926" /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">Industry</span>
+            <div class="detail-field-wrap"><span class="detail-val">IT Services &amp; Consulting</span><input
+                class="detail-edit-input" value="IT Services & Consulting" /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">HQ</span>
+            <div class="detail-field-wrap"><span class="detail-val">Pune, Maharashtra</span><input
+                class="detail-edit-input" value="Pune, Maharashtra" /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">Employees</span>
+            <div class="detail-field-wrap"><span class="detail-val">23,000+</span><input class="detail-edit-input"
+                value="23,000+" /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">Website</span>
+            <div class="detail-field-wrap"><span class="detail-val">persistent.com</span><input
+                class="detail-edit-input" value="persistent.com" /></div>
+          </div>
+        </div>
+        <div class="detail-card" id="contact-detail-card">
+          <h3>Hiring Contact <button class="edit-btn" id="contact-edit-btn" style="float:right"
+              onclick="toggleContactEdit()">Edit</button></h3>
+          <div class="detail-row"><span class="detail-label">Name</span>
+            <div class="detail-field-wrap"><span class="detail-val">Priya Sharma</span><input class="detail-edit-input"
+                value="Priya Sharma" /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">Role</span>
+            <div class="detail-field-wrap"><span class="detail-val">Campus Recruitment Lead</span><input
+                class="detail-edit-input" value="Campus Recruitment Lead" /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">Email</span>
+            <div class="detail-field-wrap"><span class="detail-val">priya.s@persistent.com</span><input
+                class="detail-edit-input" value="priya.s@persistent.com" /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">Phone</span>
+            <div class="detail-field-wrap"><span class="detail-val">+91 98XXX XXXXX</span><input
+                class="detail-edit-input" value="+91 98XXX XXXXX" /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">Plan</span>
+            <div class="detail-field-wrap"><span class="detail-val" style="color:var(--warning)">Per-Drive · 2
+                left</span><input class="detail-edit-input" value="Per-Drive · 2 left" /></div>
+          </div>
+          <div class="detail-row"><span class="detail-label">Joined</span>
+            <div class="detail-field-wrap"><span class="detail-val">April 2026</span><input class="detail-edit-input"
+                value="April 2026" /></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill Badges — what this company hires for -->
+      <!-- API: GET /recruiter/skill-badges -->
+      <div class="detail-card">
+        <h3>Hiring Skill Signals <span
+            style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:8px">Select skills you hire for —
+            visible to students on your company card</span></h3>
+        <div class="badge-grid">
+          <button class="skill-badge sel" onclick="this.classList.toggle('sel')">JavaScript</button>
+          <button class="skill-badge sel" onclick="this.classList.toggle('sel')">React</button>
+          <button class="skill-badge sel" onclick="this.classList.toggle('sel')">Node.js</button>
+          <button class="skill-badge sel" onclick="this.classList.toggle('sel')">Python</button>
+          <button class="skill-badge" onclick="this.classList.toggle('sel')">Java</button>
+          <button class="skill-badge" onclick="this.classList.toggle('sel')">C++</button>
+          <button class="skill-badge" onclick="this.classList.toggle('sel')">Embedded C</button>
+          <button class="skill-badge" onclick="this.classList.toggle('sel')">RTOS</button>
+          <button class="skill-badge sel" onclick="this.classList.toggle('sel')">SQL</button>
+          <button class="skill-badge" onclick="this.classList.toggle('sel')">AWS</button>
+          <button class="skill-badge" onclick="this.classList.toggle('sel')">Docker</button>
+          <button class="skill-badge" onclick="this.classList.toggle('sel')">Machine Learning</button>
+          <button class="skill-badge" onclick="this.classList.toggle('sel')">Data Analysis</button>
+          <button class="skill-badge" onclick="this.classList.toggle('sel')">System Design</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div class="drawer-backdrop" id="drawer-backdrop">
+    <div class="drawer-overlay" onclick="closeDrawer()"></div>
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <h2 id="drawer-title"></h2><button class="drawer-close" onclick="closeDrawer()"><svg width="16" height="16"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg></button>
+      </div>
+      <div class="drawer-body" id="drawer-body"></div>
+    </div>
+  </div>
+  <div id="toast-wrap"></div>
+  <script>
+    const DEV_MODE = true;
+    const isVerified = true;
+    const ZONE_TITLES = { home: 'Home', talent: 'Talent Discovery', drives: 'My Drives', insights: 'College Insights', hub: 'Community Hub', profile: 'Company Profile' };
+    function switchZone(name) {
+      document.querySelectorAll('.zone').forEach(z => z.classList.remove('active'));
+      const t = document.getElementById('zone-' + name); if (t) t.classList.add('active');
+      const el = document.getElementById('zone-title'); if (el) el.textContent = ZONE_TITLES[name] || name;
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.zone === name));
+      location.hash = name;
+      const m = document.getElementById('main-content'); if (m) m.scrollTop = 0;
+      // Footer only visible on home zone
+      const footer = document.querySelector('.rec-footer');
+      if (footer) footer.classList.toggle('home-visible', name === 'home');
+      if (window.innerWidth < 768) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('mob-overlay').classList.remove('show'); }
+    }
+    function showToast(message, type = 'success') { const w = document.getElementById('toast-wrap'); const d = document.createElement('div'); d.className = 'toast ' + type; d.innerHTML = '<span class="toast-msg">' + message + '</span><button class="toast-close" onclick="this.closest(\'.toast\').remove()">×</button>'; w.appendChild(d); setTimeout(() => { d.classList.add('toast-out'); setTimeout(() => d.remove(), 250) }, 3000) }
+    function openDrawer(title, contentHTML) { document.getElementById('drawer-title').textContent = title; document.getElementById('drawer-body').innerHTML = contentHTML; document.getElementById('drawer-backdrop').classList.add('open'); document.body.style.overflow = 'hidden' }
+    function closeDrawer() { document.getElementById('drawer-backdrop').classList.remove('open'); document.body.style.overflow = '' }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer() });
+    if (isVerified) { const vw = document.getElementById('verify-widget'); if (vw) vw.style.display = 'none' }
+    window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (ZONE_TITLES[h]) switchZone(h) });
+    if (location.hash.length > 1) { const h = location.hash.slice(1); if (ZONE_TITLES[h]) switchZone(h) }
+
+    /* ── COLLEGE DATA ── */
+    const INDIA_COLLEGES = ['MIT Pune', 'COEP Pune', 'VIT Pune', 'Symbiosis Institute', 'PICT Pune', 'MAEER’s MIT College', 'Pune Institute of Computer Technology', 'Fergusson College Pune', 'Modern College Pune', 'VJTI Mumbai', 'SPIT Mumbai', 'K.J. Somaiya College', 'Thadomal Shahani Engineering', 'NIT Surathkal', 'BITS Pilani Goa', 'IIT Bombay', 'IIIT Hyderabad', 'Manipal Institute of Technology', 'Amrita Vishwa Vidyapeetham', 'KIIT Bhubaneswar', 'SRM Institute Chennai', 'Vellore Institute of Technology', 'PSG College of Technology', 'NSIT Delhi', 'DTU Delhi'];
+    let _selColleges = [];
+
+    function _renderChips() { const t = document.getElementById('col-trigger'); if (!t) return; const cw = t.querySelector('.college-chips-wrap'); if (!cw) return; cw.innerHTML = _selColleges.length ? _selColleges.map(c => `<span class="college-chip">${c}<button class="college-chip-x" onclick="_removeCol('${c}');event.stopPropagation()">\u00d7</button></span>`).join('') : '<span class="college-ph">Click to select colleges…</span>'; const hi = document.getElementById('col-hidden'); if (hi) hi.value = _selColleges.join(', '); }
+    function _removeCol(n) { _selColleges = _selColleges.filter(c => c !== n); _renderChips(); _renderOpts(); }
+    function _toggleDD() { const dd = document.getElementById('col-dd'); if (!dd) return; const open = dd.classList.contains('open'); dd.classList.toggle('open', !open); if (!open) { _renderOpts(); const s = document.getElementById('col-search'); if (s) { s.value = ''; s.focus(); } } }
+    function _filterCols() { _renderOpts(document.getElementById('col-search')?.value?.toLowerCase() || ''); }
+    function _renderOpts(q = '') { const l = document.getElementById('col-opts'); if (!l) return; const filtered = INDIA_COLLEGES.filter(c => c.toLowerCase().includes(q)); l.innerHTML = filtered.map(c => { const s = _selColleges.includes(c); return `<div class="college-opt${s ? ' sel' : ''}" onclick="_toggleCol('${c}')" ><div class="college-cb">${s ? '\u2713' : ''}</div><span class="college-cname">${c}</span></div>`; }).join(''); }
+    function _toggleCol(n) { if (_selColleges.includes(n)) { _selColleges = _selColleges.filter(c => c !== n); } else { _selColleges.push(n); } _renderChips(); _renderOpts(document.getElementById('col-search')?.value?.toLowerCase() || ''); }
+    function _selAll() { const q = document.getElementById('col-search')?.value?.toLowerCase() || ''; INDIA_COLLEGES.filter(c => c.toLowerCase().includes(q)).forEach(c => { if (!_selColleges.includes(c)) _selColleges.push(c); }); _renderChips(); _renderOpts(q); }
+    document.addEventListener('click', e => { const dd = document.getElementById('col-dd'); const tr = document.getElementById('col-trigger'); if (dd && tr && !dd.contains(e.target) && !tr.contains(e.target)) dd.classList.remove('open'); });
+
+    /* ── P-2: DRIVES FUNCTIONS ── */
+    const TEMPLATES = { sde: { role: 'Software Development Engineer', type: 'Full-Time', jd: 'We are looking for a passionate SDE to join our campus hiring batch. The role involves building scalable backend services and collaborating in an agile environment.', ctcMin: 12, ctcMax: 18, cgpa: 6.5, colleges: 'MIT Pune, COEP Pune', date: '2026-05-28', slots: 40 }, embedded: { role: 'Embedded Systems Engineer', type: 'Full-Time', jd: 'Seeking Embedded Engineers for our R&D division. Responsibilities include firmware development, RTOS integration, and hardware bring-up.', ctcMin: 8, ctcMax: 14, cgpa: 6.5, colleges: 'VIT Pune', date: '2026-06-15', slots: 25 }, data: { role: 'Data Analyst', type: 'Full-Time', jd: 'Join our analytics team. Proficiency in Python, SQL, and data visualisation tools expected. You will build dashboards and derive insights.', ctcMin: 6, ctcMax: 10, cgpa: 7.0, colleges: 'MIT Pune, COEP Pune, Symbiosis Institute', date: '', slots: 20 } };
+
+    function openPostDrive(tpl) {
+      const t = tpl ? TEMPLATES[tpl] : { role: '', type: 'Full-Time', jd: '', ctcMin: '', ctcMax: '', cgpa: '', colleges: '', date: '', slots: '' };
+      const preCol = t.colleges || '';
+      const html = `
+<div class="form-section"><div class="form-section-title">Role Details</div>
+<div class="form-field"><label class="form-label">Role Title</label><input id="drv-role" class="form-input" value="${t.role}" placeholder="e.g. Software Development Engineer"/></div>
+<div class="form-row">
+<div class="form-field"><label class="form-label">Employment Type</label><select id="drv-type" class="form-input"><option ${t.type === 'Full-Time' ? 'selected' : ''}>Full-Time</option><option>Internship</option><option>Contract</option></select></div>
+<div class="form-field"><label class="form-label">Drive Date</label><input id="drv-date" class="form-input" type="date" value="${t.date}"/></div>
+</div>
+<div class="form-field"><label class="form-label">Job Description</label><textarea id="drv-jd" class="form-input">${t.jd}</textarea>
+<div class="form-note">⚡ This JD syncs to the Student Dashboard and generates prep roadmaps for students.</div></div>
+</div>
+<div class="form-section"><div class="form-section-title">Requirements</div>
+<div class="form-row">
+<div class="form-field"><label class="form-label">CTC Min (LPA)</label><input id="drv-ctcmin" class="form-input" type="number" value="${t.ctcMin}" placeholder="e.g. 8"/></div>
+<div class="form-field"><label class="form-label">CTC Max (LPA)</label><input id="drv-ctcmax" class="form-input" type="number" value="${t.ctcMax}" placeholder="e.g. 14"/></div>
+</div>
+<div class="form-row">
+<div class="form-field"><label class="form-label">Min CGPA</label><input id="drv-cgpa" class="form-input" type="number" step="0.1" value="${t.cgpa}" placeholder="e.g. 6.5"/></div>
+<div class="form-field"><label class="form-label">Slots</label><input id="drv-slots" class="form-input" type="number" value="${t.slots}" placeholder="e.g. 40"/></div>
+</div>
+<div class="form-field">
+<label class="form-label">Target Colleges</label>
+<div class="college-select-wrap">
+  <div class="college-select-trigger" id="col-trigger" onclick="_toggleDD()">
+    <div class="college-chips-wrap"><span class="college-ph">Click to select colleges…</span></div>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="college-dropdown" id="col-dd">
+    <div class="college-dd-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4e4b60" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="college-search" id="col-search" placeholder="Search colleges…" oninput="_filterCols()"/>
+      <button class="college-sel-all" onclick="_selAll()">Select All</button>
+    </div>
+    <div class="college-list" id="col-opts"></div>
+  </div>
+  <input type="hidden" id="col-hidden" value="${preCol}"/>
+</div>
+<div class="form-note" style="margin-top:6px">Registered colleges on Aegis. Students at selected colleges will see your drive.</div>
+</div>
+</div>
+<div class="drawer-footer">
+<button class="btn-ghost" onclick="closeDrawer()">Cancel</button>
+<button class="btn-primary" onclick="saveDrive(false)">Save Draft</button>
+<button class="btn-primary" style="background:var(--success)" onclick="saveDrive(true)">Publish →</button>
+</div>`;
+      openDrawer(tpl ? 'Edit Drive' : 'Post a New Drive', html);
+      _selColleges = preCol ? preCol.split(',').map(c => c.trim()).filter(Boolean) : [];
+      _renderChips();
+    } function togglePipeline(id) {
+      const el = document.getElementById('pipeline-' + id);
+      if (!el) return;
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function saveDrive(publish) {
+      const role = document.getElementById('drv-role')?.value || 'New Drive';
+      const empType = document.getElementById('drv-type')?.value || 'Full-Time';
+      const date = document.getElementById('drv-date')?.value || '';
+      const slots = document.getElementById('drv-slots')?.value || '?';
+      const colleges = document.getElementById('col-hidden')?.value || 'All registered colleges';
+      if (publish) {
+        if (!role.trim()) { showToast('Please enter a role title', 'warning'); return; }
+        const lid = 'drive-' + Date.now();
+        const letter = (role[0] || 'N').toUpperCase();
+        const dateStr = date ? new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBD';
+        const colors = ['#7c4dff,#4a25d4', '#2dd4a1,#1a9e78', '#4da6ff,#2563eb', '#f59e0b,#d97706'];
+        const grad = colors[Math.floor(Math.random() * colors.length)];
+        const card = `<div class="drive-card" id="${lid}" style="border-left:3px solid var(--success);animation:fadein .3s ease"><div class="drive-head"><div class="drive-icon" style="background:linear-gradient(135deg,${grad})">${letter}</div><div class="drive-meta"><div style="display:flex;align-items:center;gap:10px"><span class="drive-title">${role}</span><span class="status-chip live"><span class="status-dot"></span>LIVE</span></div><div class="drive-info">📅 ${dateStr} · 🏦 ${colleges} · 👥 ${slots} slots · just published</div></div></div><div class="pipe-bar"><div class="pipe-seg"><div class="pipe-fill" style="width:4px;background:#4da6ff"></div><span class="pipe-lbl">Applied</span><span class="pipe-num">0</span></div><div class="pipe-seg"><div class="pipe-fill" style="width:4px;background:#7c4dff"></div><span class="pipe-lbl">Shortlisted</span><span class="pipe-num">0</span></div><div class="pipe-seg"><div class="pipe-fill" style="width:4px;background:#ffb347"></div><span class="pipe-lbl">Offered</span><span class="pipe-num">0</span></div><div class="pipe-seg"><div class="pipe-fill" style="width:4px;background:#2dd4a1"></div><span class="pipe-lbl">Hired</span><span class="pipe-num">0</span></div></div><div class="drive-actions"><button class="btn-ghost" style="font-size:12px;padding:7px 14px" onclick="openPostDrive(null)">✏ Edit</button></div></div>`;
+        document.getElementById('drives-list-view').insertAdjacentHTML('afterbegin', card);
+        const kd = document.getElementById('kpi-drives'); if (kd) kd.textContent = parseInt(kd.textContent || 0) + 1;
+        closeDrawer();
+        showToast(`✨ "${role}" is now LIVE! Students can start applying.`, 'success');
+        switchZone('drives');
+      } else {
+        closeDrawer();
+        showToast('Drive saved as draft', 'success');
+      }
+    }
+
+    function publishDraftDrive() {
+      const card = document.getElementById('drive-bosch');
+      if (card) {
+        const chip = card.querySelector('.status-chip');
+        if (chip) { chip.className = 'status-chip live'; chip.innerHTML = '<span class="status-dot"></span>LIVE'; }
+        const noApps = card.querySelector('.no-apps');
+        if (noApps) { noApps.style.borderLeft = '3px solid var(--success)'; noApps.textContent = '\u2705 Drive published! Applications will start flowing in.'; }
+        const actions = card.querySelector('.drive-actions');
+        if (actions) { const pb = actions.querySelector('button.btn-primary'); if (pb) pb.remove(); }
+        card.style.borderLeft = '3px solid var(--success)';
+        const kd = document.getElementById('kpi-drives'); if (kd) kd.textContent = parseInt(kd.textContent || 1) + 1;
+      }
+      showToast('Bosch Embedded Engineer drive is now LIVE! 🎉', 'success');
+    }
+
+    /* ── P-2: HUB FUNCTIONS ── */
+    function setPostType(btn) {
+      document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('on'));
+      btn.classList.add('on');
+    }
+
+    function submitPost() {
+      // API: POST /community/posts
+      const ta = document.getElementById('compose-ta');
+      if (!ta.value.trim()) { showToast('Write something before posting', 'warning'); return; }
+      showToast('Post published to Community Feed', 'success');
+      ta.value = '';
+    }
+    /* ── COMPANY PROFILE EDIT ── */
+    function _toggleCardEdit(cardId, btnId, editBtnRef) {
+      const card = document.getElementById(cardId);
+      const btn = document.getElementById(btnId);
+      if (!card || !btn) return;
+      const active = card.classList.contains('edit-active');
+      if (!active) {
+        card.classList.add('edit-active');
+        btn.textContent = 'Save Changes';
+        btn.className = 'edit-btn-save';
+        btn.onclick = () => _toggleCardEdit(cardId, btnId, editBtnRef);
+      } else {
+        card.querySelectorAll('.detail-field-wrap').forEach(fw => {
+          const val = fw.querySelector('.detail-val');
+          const inp = fw.querySelector('.detail-edit-input');
+          if (val && inp) { val.textContent = inp.value; }
+        });
+        card.classList.remove('edit-active');
+        btn.textContent = 'Edit';
+        btn.className = 'edit-btn';
+        btn.onclick = () => _toggleCardEdit(cardId, btnId, editBtnRef);
+        showToast('Profile updated successfully ✓', 'success');
+      }
+    }
+    function toggleCompanyEdit() { _toggleCardEdit('company-detail-card', 'company-edit-btn', 'toggleCompanyEdit'); }
+    function toggleContactEdit() { _toggleCardEdit('contact-detail-card', 'contact-edit-btn', 'toggleContactEdit'); }
+    // API: GET /recruiter/drives?view=calendar
+    const CALENDAR_DRIVES = [
+      { id: 'infosys', label: 'Infosys SDE', date: '2026-05-28', status: 'live', colleges: 'MIT Pune, COEP', slots: 40 },
+      { id: 'bosch', label: 'Bosch Embedded', date: '2026-06-15', status: 'draft', colleges: 'VIT Pune', slots: 25 },
+      { id: 'persist', label: 'Persistent Backend', date: '2026-07-10', status: 'draft', colleges: 'MIT Pune, VIT Pune', slots: 30 }
+    ];
+
+    // API: GET /recruiter/dashboard-summary
+    const HOME_KPI = { activeDrives: 2, totalApplicants: 23, shortlisted: 8, confirmedHires: 1, pendingFee: 18000 };
+
+    /* ── HOME CALENDAR STRIP ── */
+    function buildHomeCalStrip() {
+      const el = document.getElementById('home-cal-strip');
+      if (!el) return;
+      // API: month config — GET /config/placement-season
+      const months = [
+        { name: 'May 2026', yr: 2026, mo: 4 },
+        { name: 'June 2026', yr: 2026, mo: 5 },
+        { name: 'July 2026', yr: 2026, mo: 6 }
+      ];
+      let html = '';
+      months.forEach((m, i) => {
+        html += `<div class="cal-month">
+      <div class="cal-month-label">${m.name}</div>`;
+        const drives = CALENDAR_DRIVES.filter(d => {
+          const dd = new Date(d.date);
+          return dd.getFullYear() === m.yr && dd.getMonth() === m.mo;
+        });
+        if (drives.length) {
+          drives.forEach(d => {
+            const dt = new Date(d.date);
+            const day = dt.getDate();
+            html += `<div class="cal-drive-row">
+          <span class="cal-drive-date">${day} ${m.name.slice(0, 3)}</span>
+          <span class="cal-chip ${d.status}">${d.status === 'live' ? '&#9679;' : '&#9675;'} ${d.label}</span>
+        </div>`;
+          });
+        } else {
+          html += `<div class="cal-empty">No drives this month</div>`;
+        }
+        html += '</div>';
+        if (i < months.length - 1) html += '<div class="cal-month-divider"></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    /* ── DRIVE CALENDAR GRID ── */
+    const DOW_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    function buildDriveCalGrid() {
+      const el = document.getElementById('drive-cal-grid');
+      if (!el) return;
+      const months = [
+        { name: 'May 2026', yr: 2026, mo: 4 },
+        { name: 'Jun 2026', yr: 2026, mo: 5 },
+        { name: 'Jul 2026', yr: 2026, mo: 6 }
+      ];
+      const today = new Date();
+      let html = '';
+      months.forEach(m => {
+        const first = new Date(m.yr, m.mo, 1);
+        const last = new Date(m.yr, m.mo + 1, 0).getDate();
+        const startDow = first.getDay();
+        let cells = [];
+        for (let i = 0; i < startDow; i++) cells.push(null);
+        for (let d = 1; d <= last; d++) cells.push(d);
+        while (cells.length % 7 !== 0) cells.push(null);
+        const driveMap = {};
+        CALENDAR_DRIVES.forEach(dr => {
+          const dd = new Date(dr.date);
+          if (dd.getFullYear() === m.yr && dd.getMonth() === m.mo) {
+            driveMap[dd.getDate()] = dr;
+          }
+        });
+        html += `<div class="cal-grid-month"><div class="cal-grid-month-label">${m.name}</div>`;
+        html += '<div class="cal-dow-row">';
+        DOW_LABELS.forEach(d => { html += `<div class="cal-dow-cell">${d}</div>`; });
+        html += '</div><div class="cal-grid-weeks">';
+        for (let w = 0; w < cells.length; w += 7) {
+          html += '<div class="cal-grid-week">';
+          for (let c = w; c < w + 7; c++) {
+            const day = cells[c];
+            if (!day) { html += '<div class="cal-grid-day empty"></div>'; continue; }
+            const isToday = today.getFullYear() === m.yr && today.getMonth() === m.mo && today.getDate() === day;
+            const dr = driveMap[day];
+            html += `<div class="cal-grid-day${isToday ? ' today-cell' : ''}"><div class="day-num">${day}</div>${dr ? `<button class="cal-event-chip ${dr.status}" onclick="showDrivePopover(event,'${dr.id}')">${dr.label.split(' ')[0]}</button>` : ''
+              }</div>`;
+          }
+          html += '</div>';
+        }
+        html += '</div></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    /* ── POPOVER ── */
+    let _popover = null;
+    function showDrivePopover(e, id) {
+      e.stopPropagation();
+      closePopover();
+      // API: GET /drives/:id — quick summary
+      const dr = CALENDAR_DRIVES.find(d => d.id === id);
+      if (!dr) return;
+      const p = document.createElement('div');
+      p.className = 'cal-popover show';
+      p.id = 'cal-pop';
+      const dt = new Date(dr.date);
+      const dateStr = dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      p.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="cal-popover-title">${dr.label}</div>
+      <button onclick="closePopover()" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;line-height:1">&times;</button>
+    </div>
+    <div class="cal-popover-row"><strong>Date</strong>${dateStr}</div>
+    <div class="cal-popover-row"><strong>Colleges</strong>${dr.colleges}</div>
+    <div class="cal-popover-row"><strong>Slots</strong>${dr.slots} openings</div>
+    <div class="cal-popover-row"><strong>Status</strong><span class="status-chip ${dr.status}" style="padding:1px 7px"><span class="status-dot"></span>${dr.status.toUpperCase()}</span></div>
+    <button class="cal-popover-link" onclick="closePopover();switchDriveView('list');showToast('Showing ${dr.label} in list view','info')">View Drive &#8594;</button>`;
+      document.body.appendChild(p);
+      const rect = e.currentTarget.getBoundingClientRect();
+      let left = rect.right + 8;
+      if (left + 230 > window.innerWidth) left = rect.left - 238;
+      p.style.top = (rect.top + window.scrollY) + 'px';
+      p.style.left = left + 'px';
+      _popover = p;
+    }
+    function closePopover() { if (_popover) { _popover.remove(); _popover = null; } }
+    document.addEventListener('click', e => { if (_popover && !_popover.contains(e.target)) closePopover(); });
+
+    /* ── DRIVE VIEW SWITCHER ── */
+    function switchDriveView(view) {
+      const list = document.getElementById('drives-list-view');
+      const cal = document.getElementById('drives-cal-view');
+      const tList = document.getElementById('tab-list');
+      const tCal = document.getElementById('tab-cal');
+      if (view === 'calendar') {
+        list.style.display = 'none';
+        cal.style.display = 'block';
+        tList.classList.remove('active');
+        tCal.classList.add('active');
+        buildDriveCalGrid();
+      } else {
+        cal.style.display = 'none';
+        list.style.display = 'block';
+        tCal.classList.remove('active');
+        tList.classList.add('active');
+      }
+    }
+
+    /* ── SIDEBAR TOGGLE ── */
+    const ZONE_NAMES = { home: 'Home', talent: 'Talent Discovery', drives: 'My Drives', insights: 'College Insights', hub: 'Community Hub', profile: 'Company Profile' };
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const main = document.getElementById('main-content');
+      const col = sb.classList.toggle('sb-collapsed');
+      if (main) main.style.marginLeft = col ? '64px' : '240px';
+    }
+    /* ── BULK SHORTLIST ── */
+    function toggleCand(card, driveId) {
+      card.classList.toggle('sel');
+      const cb = card.querySelector('.cand-cb');
+      if (cb) cb.textContent = card.classList.contains('sel') ? '\u2713' : '';
+      const sel = document.querySelectorAll(`#cand-list-${driveId} .cand-card.sel`).length;
+      const bar = document.getElementById(`bulk-bar-${driveId}`);
+      const cnt = document.getElementById(`bulk-count-${driveId}`);
+      if (bar) { bar.style.display = sel > 0 ? 'flex' : 'none'; }
+      if (cnt) cnt.textContent = sel + ' selected';
+    }
+    function bulkAction(driveId, action) {
+      const sel = document.querySelectorAll(`#cand-list-${driveId} .cand-card.sel`);
+      const names = [...sel].map(c => c.querySelector('.cand-name')?.textContent || '').join(', ');
+      if (action === 'shortlist') { showToast(`${sel.length} candidate(s) shortlisted: ${names}`, 'success'); }
+      else if (action === 'reject') { showToast(`${sel.length} candidate(s) removed from pipeline`, 'warning'); }
+      else if (action === 'export') { showToast(`Exporting ${sel.length} candidate profile(s) as CSV…`, 'info'); }
+      sel.forEach(c => { c.classList.remove('sel'); const cb = c.querySelector('.cand-cb'); if (cb) cb.textContent = ''; });
+      const bar = document.getElementById(`bulk-bar-${driveId}`);
+      if (bar) bar.style.display = 'none';
+    }
+    /* ── ANALYTICS ── */
+    const FUNNEL_DATA = [
+      { id: 'applied', lbl: 'Applied', n: 1247, pct: 100, color: '#4da6ff', insight: '1,247 candidates submitted applications across MIT Pune, COEP, VIT Pune and 3 other colleges.' },
+      { id: 'shortlisted', lbl: 'Shortlisted', n: 312, pct: 25, color: '#7c4dff', insight: '25% shortlist rate — top-of-funnel is healthy. 935 candidates were filtered based on CGPA ≥ 6.5 and skill match.' },
+      { id: 'interviewed', lbl: 'Interviewed', n: 89, pct: 28.5, color: '#ffb347', insight: '28.5% of shortlisted candidates were interviewed. Most drop-off is resume-stage, not interview-stage.' },
+      { id: 'offered', lbl: 'Offer Extended', n: 28, pct: 31.5, color: '#f59e0b', insight: '31.5% of interviewed candidates received offers. Strong signal — your interview-to-offer conversion is above platform average (22%).' },
+      { id: 'hired', lbl: 'Confirmed Hire', n: 21, pct: 75, color: '#2dd4a1', insight: '75% offer acceptance rate — excellent. Platform benchmark is 61%. Competitive CTC package is the main driver.' }
+    ];
+    const COLLEGE_DATA = [
+      { id: 'coep', name: 'COEP Pune', applied: 245, selected: 35, rate: 14.3, rateClass: 'rate-hi', insight: 'Best-performing campus. 14.3% selection rate. Strong in DSA, System Design. Recommended for priority slot allocation.' },
+      { id: 'mit', name: 'MIT Pune', applied: 198, selected: 28, rate: 14.1, rateClass: 'rate-hi', insight: 'Consistent performer with high offer acceptance (80%). Students are well-prepared via placement cell.' },
+      { id: 'vit', name: 'VIT Pune', applied: 167, selected: 14, rate: 8.4, rateClass: 'rate-md', insight: 'Mid-tier conversion. Profile quality is mixed. Consider targeting VIT students with pre-assessment screening.' },
+      { id: 'sym', name: 'Symbiosis Institute', applied: 89, selected: 6, rate: 6.7, rateClass: 'rate-md', insight: 'Lower volume college but niche MBA+Tech profiles. Good for non-engineering roles.' },
+      { id: 'pict', name: 'PICT Pune', applied: 67, selected: 4, rate: 6.0, rateClass: 'rate-lo', insight: 'Low ROI campus currently. CGPA average is below threshold. Consider raising awareness via Community Hub posts.' }
+    ];
+    let _activeFunnel = null, _activeCollege = null;
+    function buildAnalytics() {
+      const fw = document.getElementById('funnel-wrap');
+      if (fw) fw.innerHTML = FUNNEL_DATA.map(f => `<div class="funnel-row" id="fr-${f.id}" onclick="showFunnel('${f.id}')">
+    <div class="funnel-top"><span class="funnel-lbl">${f.lbl}</span><span class="funnel-num">${f.n.toLocaleString('en-IN')}</span></div>
+    <div class="funnel-track"><div class="funnel-bar" style="width:${f.pct}%;background:${f.color}"></div></div>
+    <div class="funnel-drop">${f.pct}% of pipeline</div>
+  </div>`).join('');
+      const cw = document.getElementById('college-chart-wrap');
+      if (cw) cw.innerHTML = COLLEGE_DATA.map(c => {
+        const appW = Math.round((c.applied / 245) * 100);
+        const selW = Math.round((c.selected / 35) * 100);
+        return `<div class="col-row" id="cr-${c.id}" onclick="showCollege('${c.id}')">
+      <div class="col-row-top"><span class="col-name">${c.name}</span><span class="col-rate ${c.rateClass}">${c.rate}% selected</span></div>
+      <div class="col-bars">
+        <div class="col-bar-row"><span class="col-bar-lbl">Applied (${c.applied})</span><div class="col-bar-track"><div class="col-bar-fill" style="width:${appW}%;background:rgba(77,166,255,.5)"></div></div></div>
+        <div class="col-bar-row"><span class="col-bar-lbl">Selected (${c.selected})</span><div class="col-bar-track"><div class="col-bar-fill" style="width:${selW}%;background:var(--success)"></div></div></div>
+      </div>
+    </div>`;
+      }).join('');
+    }
+    function showFunnel(id) {
+      if (_activeFunnel === id) { document.querySelectorAll('.funnel-row').forEach(r => r.classList.remove('on')); document.getElementById('funnel-detail').classList.remove('show'); _activeFunnel = null; return; }
+      _activeFunnel = id;
+      document.querySelectorAll('.funnel-row').forEach(r => r.classList.remove('on'));
+      const row = document.getElementById('fr-' + id); if (row) row.classList.add('on');
+      const f = FUNNEL_DATA.find(x => x.id === id); if (!f) return;
+      const nextF = FUNNEL_DATA[FUNNEL_DATA.findIndex(x => x.id === id) + 1];
+      const dropOff = nextF ? f.n - nextF.n : 0;
+      const det = document.getElementById('funnel-detail');
+      det.innerHTML = `<div class="an-detail-stats"><div class="an-stat"><div class="an-stat-num" style="color:${f.color}">${f.n.toLocaleString('en-IN')}</div><div class="an-stat-lbl">${f.lbl}</div></div>${dropOff > 0 ? `<div class="an-stat"><div class="an-stat-num" style="color:var(--error)">&#8595;${dropOff}</div><div class="an-stat-lbl">Dropped</div></div>` : ''}<div class="an-stat"><div class="an-stat-num">${f.pct}%</div><div class="an-stat-lbl">Conversion</div></div></div><div class="an-insight">${f.insight}</div>`;
+      det.classList.add('show');
+    }
+    function showCollege(id) {
+      if (_activeCollege === id) { document.querySelectorAll('.col-row').forEach(r => r.classList.remove('on')); document.getElementById('college-detail').classList.remove('show'); _activeCollege = null; return; }
+      _activeCollege = id;
+      document.querySelectorAll('.col-row').forEach(r => r.classList.remove('on'));
+      const row = document.getElementById('cr-' + id); if (row) row.classList.add('on');
+      const c = COLLEGE_DATA.find(x => x.id === id); if (!c) return;
+      const roi = ((c.selected / c.applied) * 100).toFixed(1);
+      const det = document.getElementById('college-detail');
+      det.innerHTML = `<div class="an-detail-stats"><div class="an-stat"><div class="an-stat-num">${c.applied}</div><div class="an-stat-lbl">Applied</div></div><div class="an-stat"><div class="an-stat-num" style="color:var(--success)">${c.selected}</div><div class="an-stat-lbl">Selected</div></div><div class="an-stat"><div class="an-stat-num">${roi}%</div><div class="an-stat-lbl">Hit Rate</div></div></div><div class="an-insight">${c.insight}</div>`;
+      det.classList.add('show');
+    }
+    /* ── INIT ── */
+    document.addEventListener('DOMContentLoaded', () => {
+      buildHomeCalStrip();
+      buildAnalytics();
+      // Show footer on home zone (default active)
+      const footer = document.querySelector('.rec-footer');
+      if (footer) footer.classList.add('home-visible');
+      // Set welcome date in company card
+      const wd = document.getElementById('welcome-date');
+      if (wd) wd.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    });
+  </script>
+
+  <!-- AEGIS RECRUITER FOOTER -->
+  <footer class="rec-footer">
+    <!-- Decorative top edge -->
+    <div class="rec-footer-divider"></div>
+    <div class="rec-footer-glow"></div>
+
+    <div class="rec-footer-inner">
+      <div class="rec-footer-grid">
+        <!-- Brand column -->
+        <div class="rec-footer-brand">
+          <div class="rec-footer-brand-logo">
+            <div class="rec-footer-brand-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c4dff" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <div>
+              <div class="rec-footer-brand-name">AEGIS</div>
+              <div class="rec-footer-brand-sub">Recruiter Portal</div>
+            </div>
+          </div>
+          <p class="rec-footer-brand-desc">The next-generation campus placement OS for HR professionals and talent
+            teams. Built for speed, trust, and quality hiring.</p>
+          <div class="rec-footer-socials">
+            <div class="rec-footer-social" title="LinkedIn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" />
+                <rect x="2" y="9" width="4" height="12" />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+            </div>
+            <div class="rec-footer-social" title="Twitter">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
+              </svg>
+            </div>
+            <div class="rec-footer-social" title="Email">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Platform links -->
+        <div class="rec-footer-col">
+          <h4>Platform</h4>
+          <a href="#" onclick="switchZone('home');return false">Home Dashboard</a>
+          <a href="#" onclick="switchZone('talent');return false">Talent Discovery</a>
+          <a href="#" onclick="switchZone('drives');return false">My Drives</a>
+          <a href="#" onclick="switchZone('insights');return false">College Insights</a>
+          <a href="#" onclick="switchZone('hub');return false">Community Hub</a>
+        </div>
+
+        <!-- Support links -->
+        <div class="rec-footer-col">
+          <h4>Support</h4>
+          <a href="#" onclick="showToast('Documentation coming soon','info');return false">Documentation</a>
+          <a href="#" onclick="showToast('Help Center coming soon','info');return false">Help Center</a>
+          <a href="#" onclick="showToast('API Status: All systems operational ✅','success');return false">API Status</a>
+          <a href="#" onclick="showToast('Changelog coming soon','info');return false">Changelog</a>
+          <a href="#" onclick="showToast('Support ticket opened','success');return false">Contact Support</a>
+        </div>
+
+        <!-- Company links -->
+        <div class="rec-footer-col">
+          <h4>Company</h4>
+          <a href="#">About Aegis</a>
+          <a href="#">Careers</a>
+          <a href="#">Blog</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="rec-footer-bottom">
+        <p class="rec-footer-copy">&copy; 2025 Aegis Growth OS. All rights reserved.</p>
+        <div class="rec-footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>

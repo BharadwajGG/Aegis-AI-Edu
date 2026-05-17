@@ -3,6 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
 import { VideoIcon, Shield, ChevronRight } from "lucide-react";
 
+// ─────────────────────────────────────────────────────────────────────
+// DEV_MODE — skip recruiter verification gate for faster dev iteration
+// SET TO false BEFORE PRODUCTION DEPLOY
+// ─────────────────────────────────────────────────────────────────────
+const DEV_MODE = true;
+
 import { useTheme } from "./src/hooks/useTheme";
 import { LANG } from "./src/constants/translations";
 import { GHOST_NAMES } from "./src/constants/ghostNames";
@@ -17,7 +23,9 @@ import { CustomCursor } from "./src/components/ui/CustomCursor";
 import { SettingsModal } from "./src/components/layout/SettingsModal";
 import { AuthLanding } from "./src/components/layout/AuthLanding";
 import { RoleSelection } from "./src/components/layout/RoleSelection";
+import { RecruiterVerification } from "./src/components/layout/RecruiterVerification";
 import { EmptyDashboard } from "./src/components/layout/EmptyDashboard";
+import { RecruiterDashboard } from "./src/components/layout/RecruiterDashboard";
 import { ProfileModal } from "./src/components/layout/ProfileModal";
 
 import { DailyStreak } from "./src/components/dashboard/growth/DailyStreak";
@@ -90,12 +98,22 @@ export default function AegisDashboard() {
 
   const isStudent = userRole === "student";
 
+
   if (loading) return <SplashScreen onComplete={() => setShowSplash(false)} />;
   if (!user) return <AuthLanding login={login} loginRedirect={loginRedirect} emailLogin={emailLogin} emailSignup={emailSignup} />;
   
   // If user is logged in but hasn't selected a role, show RoleSelection
   if (!userRole) {
     return <RoleSelection onSelect={setRole} />;
+  }
+
+  // Recruiter: show full dashboard (verification handled separately in production)
+  if (userRole === "recruiter") {
+    const recruiterStatus = localStorage.getItem("aegis_recruiter_status");
+    if (!DEV_MODE && recruiterStatus !== "approved") {
+      return <RecruiterVerification />;
+    }
+    return <RecruiterDashboard user={user} logout={logout} />;
   }
 
   return (
