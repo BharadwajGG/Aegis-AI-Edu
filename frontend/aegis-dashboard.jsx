@@ -41,7 +41,10 @@ import { IntegrityScore } from "./src/components/dashboard/competitive/Integrity
 import { LiveChallenge } from "./src/components/dashboard/competitive/LiveChallenge";
 import { StatsSidebar } from "./src/components/dashboard/competitive/StatsSidebar";
 
-export default function AegisDashboard() {
+import { ResumeUploader } from "./src/components/dashboard/profile/ResumeUploader";
+import { AIProfileDashboard } from "./src/components/dashboard/profile/AIProfileDashboard";
+
+export default function AegisDashboard({ user, userRole, logout }) {
   const [showSplash, setShowSplash] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const [mode, setMode] = useState("growth");
@@ -207,6 +210,10 @@ export default function AegisDashboard() {
                       </div>
                     </div>
 
+                    <div className="mb-6">
+                      <ResumeUploader apiKey={apiKey} t={t} accent={accent} accentDim={accentDim} cardStyle={accentCardStyle} setActiveView={setActiveView} />
+                    </div>
+
                     <div className="bento-grid">
                       {isGrowth ? (
                         <>
@@ -272,6 +279,18 @@ export default function AegisDashboard() {
               {activeView === "labelmateinsight" && (
                 <motion.div key="labelmate" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-6xl mx-auto">
                   <LabelMateInsight accent={accent} cardStyle={cardStyle} driveId={selectedDriveId} />
+                </motion.div>
+              )}
+
+              {activeView === "aiprofile" && (
+                <motion.div key="aiprofile" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-6xl mx-auto">
+                  <div className="flex items-center gap-4 mb-6">
+                     <button onClick={() => setActiveView('overview')} className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm font-medium transition-colors">
+                        ← Back to Dashboard
+                     </button>
+                     <h2 className="text-2xl font-bold tracking-tight text-white">Dynamic AI Profile</h2>
+                  </div>
+                  <AIProfileDashboard accent={accent} cardStyle={cardStyle} />
                 </motion.div>
               )}
 

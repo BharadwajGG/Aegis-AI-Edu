@@ -4,3 +4,6 @@ google-generativeai
 python-dotenv
 pydantic
 pydantic-settings
+pymupdf
+python-docx
+python-multipart

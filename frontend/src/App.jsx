@@ -9,6 +9,7 @@ import { CollegeDashboard } from './components/college/CollegeDashboard';
 import { CompanyDashboard } from './components/company/CompanyDashboard';
 import { SplashScreen } from './components/layout/SplashScreen';
 import { Toaster } from "react-hot-toast";
+import { ResumeProvider } from './contexts/ResumeContext';
 
 function HomeOrRedirect({ user, userRole }) {
   const navigate = useNavigate();
@@ -41,7 +42,9 @@ function AppRoutes() {
         <Route path="/dashboard" element={
           !user ? <Navigate to="/auth/student" /> :
           userRole === 'college' ? <Navigate to="/college" /> :
-          <AegisDashboard user={user} userRole={userRole} logout={logout} />
+          <ResumeProvider user={user}>
+            <AegisDashboard user={user} userRole={userRole} logout={logout} />
+          </ResumeProvider>
         } />
         
         <Route path="/college" element={
